@@ -591,10 +591,10 @@ def computeEM(wavelength,oscillator_strength,lambda_ref,v_obs,Normalized_Flux,pa
 
     x_blue = v_obs[np.where(v_obs<0)]/v_0
     x_red = v_obs[np.where(v_obs>=0)]/v_0
-    x_array = np.array([x_blue,x_red])
+    x_array = np.array([x_blue,x_red],dtype=object)
 
     #the aperture of the telescope is closed
-    if v_ap == 0:
+    if abs(v_ap) <= 0:
         return np.zeros_like(v_obs)
 
     with Pool(max_workers=2) as inner_pool:
