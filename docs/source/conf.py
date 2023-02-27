@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath('../../')
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'semi-analytical line transfer (SALT)'
+project = 'SALT Model'
 copyright = '2023, Cody Carr'
 author = 'Cody Carr'
 release = '0.0.1'
