@@ -18,7 +18,9 @@
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SALT" href="modules.html" />
+    <link rel="prev" title="SALT2022_Emission module" href="SALT2022_Emission.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -40,11 +42,21 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">SALT2022_LineProfile module</a></li>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SALT2022_Absorption.html">SALT2022_Absorption module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SALT2022_Emission.html">SALT2022_Emission module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SALT2022_LineProfile module</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">SALT</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="SALT2022_Absorption.html">SALT2022_Absorption module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SALT2022_Emission.html">SALT2022_Emission module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">SALT2022_LineProfile module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test.html">test module</a></li>
 </ul>
-</div>
+</li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -69,14 +81,42 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="salt2022-lineprofile-module">
-<h1>SALT2022_LineProfile module<a class="headerlink" href="#salt2022-lineprofile-module" title="Permalink to this heading"></a></h1>
+  <section id="module-SALT2022_LineProfile">
+<span id="salt2022-lineprofile-module"></span><h1>SALT2022_LineProfile module<a class="headerlink" href="#module-SALT2022_LineProfile" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="SALT2022_LineProfile.Function_CallABS">
+<span class="sig-prename descclassname"><span class="pre">SALT2022_LineProfile.</span></span><span class="sig-name descname"><span class="pre">Function_CallABS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">abs_waves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abs_osc_strs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SALT2022_LineProfile.Function_CallABS" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SALT2022_LineProfile.Function_CallEM">
+<span class="sig-prename descclassname"><span class="pre">SALT2022_LineProfile.</span></span><span class="sig-name descname"><span class="pre">Function_CallEM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">em_waves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">em_osc_strs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam_ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">New_Flux_Lists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SALT2022_LineProfile.Function_CallEM" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SALT2022_LineProfile.Line_Profile">
+<span class="sig-prename descclassname"><span class="pre">SALT2022_LineProfile.</span></span><span class="sig-name descname"><span class="pre">Line_Profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam_ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flow_parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profile_parameters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SALT2022_LineProfile.Line_Profile" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SALT2022_LineProfile.makeAbsorptionPROFILE">
+<span class="sig-prename descclassname"><span class="pre">SALT2022_LineProfile.</span></span><span class="sig-name descname"><span class="pre">makeAbsorptionPROFILE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam_ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm_flux</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SALT_parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Absorption_Profiles</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SALT2022_LineProfile.makeAbsorptionPROFILE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="SALT2022_LineProfile.makeEmissionPROFILE">
+<span class="sig-prename descclassname"><span class="pre">SALT2022_LineProfile.</span></span><span class="sig-name descname"><span class="pre">makeEmissionPROFILE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">waves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lam_ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SALT_parameters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Emission_Profiles</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#SALT2022_LineProfile.makeEmissionPROFILE" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 </section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="SALT2022_Emission.html" class="btn btn-neutral float-left" title="SALT2022_Emission module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="modules.html" class="btn btn-neutral float-right" title="SALT" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

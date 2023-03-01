@@ -9,12 +9,12 @@ Welcome to semi-analytical line transfer (SALT)'s documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
-intro
-SALT2022_Absorption
-SALT2022_Emission
-SALT2022_LineProfile
-modules
+   
+   intro
+   SALT2022_Absorption
+   SALT2022_Emission
+   SALT2022_LineProfile
+   modules
 
 Indices and tables
 ==================
