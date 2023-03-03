@@ -15,4 +15,4 @@ the details, we provide a physical description of the model parameter space here
 cite the Carr et al. (2023) paper.
 
 SALT assumes a spherical source of isotropically emitted radiation which propogates through an expanding medium (i.e., an outflow).  
-The outflow is characterized by a density field :math:'n_0( \frac { r } {R_{SF}}^-\delta'.
+The outflow is characterized by a density field :math:`n_0(\frac{r}{R_{SF}})^{-\delta}`.
