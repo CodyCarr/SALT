@@ -15,7 +15,7 @@ The basic model assumes a spherical source of isotropically emitted radiation wh
 .. figure:: ../../images/f1.jpg
    :class: with-border
 
-   The model consists of a biconical outflow of opening angle, :math:`\alpha`, and orientation angle, :math:`\psi`, which extends from the surface of the star forming region at radius, :math:`R_{SF}`, to a termianl radius, :math:`R_{W}`.
+   The model consists of a biconical outflow of opening angle, :math:`\alpha`, and orientation angle, :math:`\psi`, which extends from the surface of the star forming region at radius, :math:`R_{SF}`, to a terminal radius, :math:`R_{W}`.
 
 The SALT model represents a solution to the radiation transfer of resonant photons through the outflow.  In addition, SALT can handle fluorescent emission following resonant scattering (see Scarlata and Panagia 2015 for a description).  In the rest of this tutorial we show how to use the SALT model to fit various line profiles to constrain the underlying model described above.  All free paraemters are provided in Table 1. `
 
@@ -34,9 +34,9 @@ The SALT model represents a solution to the radiation transfer of resonant photo
    * - :math:`\gamma`
      - velocity field power law index
    * - :math:`v_{0}`
-     - launch velocity [km\ s^{-1}]
+     - launch velocity :math:`[\rm km\ s^{-1}]`
    * - :math:`v_{\infty}`
-     - terminal velocity [km\ s^{-1}]
+     - terminal velocity :math:`[\rm km\ s^{-1}]`
    * - :math:`\delta`
      - density field power law index
    * - :math:`\kappa`

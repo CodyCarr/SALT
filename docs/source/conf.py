@@ -29,3 +29,9 @@ exclude_patterns = []
 
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
+
+rst_prolog = """
+.. only:: html 
+  
+:math:`\renewcommand\AA{\text{Å}}`
+"""
