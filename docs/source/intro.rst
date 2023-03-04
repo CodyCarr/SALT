@@ -30,7 +30,7 @@ The SALT model represents a solution to the radiation transfer of resonant photo
    * - :math:`\psi`
      - orientation angle
    * - :math:`\tau`
-     - optical depth divided by :math:`f_{ul}\lambda_{ul}\ [\AA^{-1}]`
+     - optical depth divided by :math:`f_{ul}\lambda_{ul}\ [\text{Å}^{-1}]`
    * - :math:`\gamma`
      - velocity field power law index
    * - :math:`v_{0}`
