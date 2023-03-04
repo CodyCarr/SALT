@@ -78,24 +78,64 @@
              
   <section id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h1>
-<p>The semi-analyitcal line transfer (SALT) model is a semi-analytical
-radiation transfer model designed to predict the spectra of galactic outflows.
-This documentation shows how to install and compute spectra for arbitrary
-line profiles with SALT.</p>
+<p>The semi-analyitcal line transfer (SALT) model is a semi-analytical radiation transfer model designed to predict the spectra of galactic outflows.  This documentation shows how to install and compute SALT.  Examples of different line profile predictions are provided.  In addition, we provide a detailed example showcasing how to fit SALT to real spectra.</p>
 <section id="about-the-model">
 <h2>About the Model<a class="headerlink" href="#about-the-model" title="Permalink to this heading"></a></h2>
 <p>The SALT model was first introduced by Scarlata and Panagia (2015), but has since been modified by Carr et al. (2018,2023).  The
 following documentation is based on the formalism presented in Carr et al. (2023).  While we refer the reader to this paper for
-the details, we provide a physical description of the model parameter space here.  All projects which use the SALT model should
-cite the Carr et al. (2023) paper.</p>
-<p>SALT assumes a spherical source of isotropically emitted radiation which propogates through an expanding medium (i.e., an outflow).
-The outflow is characterized by a density field <span class="math notranslate nohighlight">\(n_0(\frac{r}{R_{SF}})^{-\delta}\)</span>.</p>
+the details regarding the calculation of the radiation transfer, we provide a physical description of the model and its parameter space here.  All projects which use the SALT model should cite the Carr et al. (2023) paper.</p>
+<p>The basic model assumes a spherical source of isotropically emitted radiation which propogates through an expanding medium (i.e., an outflow).  The outflow is characterized by a density field, <span class="math notranslate nohighlight">\(n(r)=n_0(\frac{r}{R_{SF}})^{-\delta}\)</span>, and velocity field, <span class="math notranslate nohighlight">\(v(r)=v_0(\frac{r}{R_{SF}})^{\gamma}\)</span>.  The geometry of the outflow is that of a bicone described by an opening angle, <span class="math notranslate nohighlight">\(\alpha\)</span>, and orientation angle, <span class="math notranslate nohighlight">\(\psi\)</span>, which can open all the way into a sphere.  A picture of the general model is provided in Figure 1.  In addition, the outflow is assumed to be embedded in a spherical envelope of dust with density which scales with the density of the outflow (see Carr et al. 2021 for a description).  The observational effects of a limiting observing aperture is also considered.</p>
 <figure class="align-default" id="id1">
-<img alt="_images/f1.png" class="with-border" src="_images/f1.png" />
+<img alt="_images/f1.jpg" class="with-border" src="_images/f1.jpg" />
 <figcaption>
-<p><span class="caption-text">This is the caption.</span><a class="headerlink" href="#id1" title="Permalink to this image"></a></p>
+<p><span class="caption-text">The model consists of a biconical outflow of opening angle, <span class="math notranslate nohighlight">\(\alpha\)</span>, and orientation angle, <span class="math notranslate nohighlight">\(\psi\)</span>, which extends from the surface of the star forming region at radius, <span class="math notranslate nohighlight">\(R_{SF}\)</span>, to a termianl radius, <span class="math notranslate nohighlight">\(R_{W}\)</span>.</span><a class="headerlink" href="#id1" title="Permalink to this image"></a></p>
 </figcaption>
 </figure>
+<p>The SALT model represents a solution to the radiation transfer of resonant photons through the outflow.  In addition, SALT can handle fluorescent emission following resonant scattering (see Scarlata and Panagia 2015 for a description).  In the rest of this tutorial we show how to use the SALT model to fit various line profiles to constrain the underlying model described above.  All free paraemters are provided in Table 1. `</p>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-text">Free parameters in SALT</span><a class="headerlink" href="#id2" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 80%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\alpha\)</span></p></td>
+<td><p>half opening angle</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\psi\)</span></p></td>
+<td><p>orientation angle</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\tau\)</span></p></td>
+<td><p>optical depth divided by <span class="math notranslate nohighlight">\(f_{ul}\lambda_{ul}\ [\AA^{-1}]\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\gamma\)</span></p></td>
+<td><p>velocity field power law index</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(v_{0}\)</span></p></td>
+<td><p>launch velocity [kms^{-1}]</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(v_{\infty}\)</span></p></td>
+<td><p>terminal velocity [kms^{-1}]</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\delta\)</span></p></td>
+<td><p>density field power law index</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\kappa\)</span></p></td>
+<td><p>dust opacity multiplied by <span class="math notranslate nohighlight">\(R_{SF}n_{0,dust}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(v_{ap}\)</span></p></td>
+<td><p>velocity field at <span class="math notranslate nohighlight">\(R_{AP}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(f_c\)</span></p></td>
+<td><p>covering fraction inside outflow</p></td>
+</tr>
+</tbody>
+</table>
 </section>
 </section>
 
