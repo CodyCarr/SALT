@@ -16,3 +16,8 @@ cite the Carr et al. (2023) paper.
 
 SALT assumes a spherical source of isotropically emitted radiation which propogates through an expanding medium (i.e., an outflow).  
 The outflow is characterized by a density field :math:`n_0(\frac{r}{R_{SF}})^{-\delta}`.
+
+.. figure:: ../../imgages/f1.png
+   :class: with-border
+
+   This is the caption.
