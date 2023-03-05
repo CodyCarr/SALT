@@ -15,9 +15,9 @@ The semi-analytical line transfer (SALT) model is a semi-analytical radiation tr
 Support
 =======
 
-If you have any issues obtaining, compiling, or running the code, please consult
+If you have any issues obtaining or running the code, please consult
 the below documentation, or let us know by email (Cody Carr, codycarr24@gmail.com).
-We are also open to collaboration.
+We are open and encourage collaboration.
 
 .. toctree::
    :maxdepth: 2
