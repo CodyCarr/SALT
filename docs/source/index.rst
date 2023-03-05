@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to SALT's documentation!
-================================
+Overview
+========
 
 The semi-analytical line transfer (SALT) model is a semi-analytical radiation transfer model designed to predict the spectra of galactic outflows.  When paired with a Monte Carlo sampler, one can constrain the SALT parameter space to recover the properties of outflows from the absorption+emission lines observed in down-the-barrel spectra.  This includes the density and velocity structure as well as the geometry (i.e., opening and orientation angles) of the outflow.
 

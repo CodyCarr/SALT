@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.abspath('../../python/'))
 project = 'SALT Model'
 copyright = '2023, Cody Carr'
 author = 'Cody Carr'
-release = '0.0.1'
+release = '1.0.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -30,3 +30,7 @@ exclude_patterns = []
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 html_logo = "theme.png"
+html_theme_options = {
+    'logo_only': True,
+    'display_version': False,
+}
