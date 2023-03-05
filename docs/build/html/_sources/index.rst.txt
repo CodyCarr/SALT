@@ -11,6 +11,7 @@ Welcome to semi-analytical line transfer (SALT)'s documentation!
    :caption: Contents:
    
    intro
+   fitting
    modules
 
 Indices and tables
