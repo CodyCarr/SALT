@@ -23,7 +23,7 @@ We are open to and encourage collaboration.
    :maxdepth: 2
    :caption: General Usage
    
-   intro
+   general_usage
 
 .. toctree::
    :maxdepth: 2

@@ -1,7 +1,7 @@
 Introduction
 ============
 
-The semi-analyitcal line transfer (SALT) model is a semi-analytical radiation transfer model designed to predict the spectra of galactic outflows.  This documentation shows how to install and compute SALT.  Examples of different line profile predictions are provided.  In addition, we provide a detailed example showcasing how to fit SALT to real spectra.  
+The semi-analyitcal line transfer (SALT) model is a semi-analytical radiation transfer model designed to predict the spectra of galactic outflows.  This documentation shows how to install and compute SALT.  Examples of different line profile predictions are provided.  In addition, we provide a detailed example showcasing how to fit SALT to a real spectrum.
 
 About the Model
 ***************
@@ -17,9 +17,12 @@ The basic model assumes a spherical source of isotropically emitted radiation wh
 
    The model consists of a biconical outflow of opening angle, :math:`\alpha`, and orientation angle, :math:`\psi`, which extends from the surface of the star forming region at radius, :math:`R_{SF}`, to a terminal radius, :math:`R_{W}`.
 
-The SALT model represents a solution to the radiation transfer of resonant photons through the outflow.  In addition, SALT can handle fluorescent emission following resonant scattering (see Scarlata and Panagia 2015 for a description).  In the rest of this tutorial we show how to use the SALT model to fit various line profiles to constrain the underlying model described above.  All free paraemters are provided in Table 1. `
+The SALT model represents a solution to the radiation transfer of resonant photons through the outflow.  In addition, SALT can handle fluorescent emission following resonant scattering (see Scarlata and Panagia 2015 for details).  The next section shows how to compute SALT given various line profiles.  Examples include lines with and without fluorescence.  
 
-.. list-table:: Free parameters in SALT
+Free Parameters
+***************
+
+.. list-table:: SALT Parameters
    :widths: 25 100
    :header-rows: 1
 
@@ -45,3 +48,18 @@ The SALT model represents a solution to the radiation transfer of resonant photo
      - velocity field at :math:`R_{AP}`
    * - :math:`f_c`
      - covering fraction inside outflow
+
+Using the Model
+===============
+
+The SALT model code consists of three python scripts: SALT2022_Absorption.py, SALT2022_Emission.py, and SALT2022_LineProfile.py.  All three scripts can be obtained from GitHub by entering the following command in a terminal window  git clone git@github.com:CodyCarr/SALT.git.  The model can also be accessed by downloading the three scripts from the following documentation.  Working from within the SALT folder, one can run SALT with Python using the following script.  
+
+.. code-block:: python
+
+    import numpy as np
+    from SALT2022_LineProfile import Line_Profile
+
+    
+    
+Examples
+========
