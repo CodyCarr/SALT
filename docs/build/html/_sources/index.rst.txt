@@ -17,19 +17,31 @@ Support
 
 If you have any issues obtaining or running the code, please consult
 the below documentation, or let us know by email (Cody Carr, codycarr24@gmail.com).
-We are open and encourage collaboration.
+We are open to and encourage collaboration.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: General Usage
    
    intro
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Fitting to Data 
+   
    fitting
+
+.. toctree::
+   :maxdepth: 2
+   :caption: The Code
+
    modules
 
-Indices and tables
-==================
+.. toctree::
+   :maxdepth: 2
+   :caption: Resources
+
+Index
+=====
 
 * :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
