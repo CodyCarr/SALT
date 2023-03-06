@@ -60,20 +60,20 @@ The SALT model code consists of three python scripts: SALT2022_Absorption.py, SA
     from SALT2022_LineProfile import Line_Profile
 
     # SALT parameters
-    alpha,psi,gamma, tau, v_0, v_w, f_c, k, delta, v_ap = np.pi/2.0,0.0,1.0,1.0,25.0,500.0,1.0,0.0,3.0
+    alpha,psi,gamma, tau, v_0, v_w, v_ap, f_c, k, delta = np.pi/2.0,0.0,1.0,1.0,25.0,500.0,500.0,1.0,0.0,3.0
 
+    # refence wavelength
+    lam_ref = 1193.28
+
+    # Observed velocity range centered on lam_ref
+    v_obs = np.linspace(-2000,2000,1000)
+    
     # Background to be scattered through SALT (this example assumes a flat continuum)
     background = np.ones_like(v_obs)
 
     # Turn Aperture and Occultation effect on or off (True or False)
     OCCULTATION = True
     APERTURE = True
-
-    # refence wavelength
-    lam_ref = 1193.28
-    
-    # Observed velocity range centered on lam_ref
-    v_obs = np.linspace(-2000,2000,1000)
 
     # Outflow parameters
     flow_parameters = {'alpha':alpha, 'psi':psi, 'gamma':gamma, 'tau':tau, 'v_0':v_0, 'v_w':v_w, 'v_ap':v_ap, 'f_c':f_c, 'k':k, 'delta':delta}
@@ -99,19 +99,22 @@ The SALT model code consists of three python scripts: SALT2022_Absorption.py, SA
     #Line_Profile --> output spectrum or line profile
     spectrum  = Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters)
 
-
+    # plot spectrum in terms of observed velocities
     from matplotlib import pyplot as plt
 
     fig, ax = plt.subplots(1,1, figsize=(7, 5))
 
     ax.plot(v_obs,spectrum,'r',linewidth = 2.0)
     
-    ax.set_xlabel('Velocity '+r'$[\rm{km} \ \rm{s}^{-1}]$',fontsize =20)
+    ax.set_xlabel('Velocity '+r'$[\rm km \ s^{-1}]$',fontsize =20)
     ax.set_ylabel(r'$F/F_0$',fontsize =20)
     plt.grid()
     plt.tight_layout()
     plt.show()
 
+.. image:: ../../images/ex1.png
+  :width: 700
+  :alt: example one
     
 Examples
 ========
