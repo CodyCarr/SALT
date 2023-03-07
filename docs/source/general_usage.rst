@@ -224,7 +224,7 @@ The following is a list of different line profiles predicted with SALT.
 
     # approximates nebular emission  emitted isotropically from the ISM as two Gaussian profiles centered on the lines
     shift = ((1550.772-1548.202)/(1548.202))*(2.99792458*10**5)
-    a,b,c = 1.0,0.0,75
+    a,b,c = 2.0,0.0,75
     aa,bb,cc = 1.0,shift,75
     background = a*np.exp(-(v_obs-b)**2.0/(2.0*c**2.0))+1.0+aa*np.exp(-(v_obs-bb)**2.0/(2.0*cc**2.0))
 
@@ -257,7 +257,7 @@ The following is a list of different line profiles predicted with SALT.
     v_obs = np.linspace(-1000,1500,1000)
 
     shift = ((2803.53-2796.35)/(2796.35))*(2.99792458*10**5)
-    a,b,c = 1.0,0.0,75
+    a,b,c = 2.0,0.0,75
     aa,bb,cc = 1.0,shift,75
     background = a*np.exp(-(v_obs-b)**2.0/(2.0*c**2.0))+1.0+aa*np.exp(-(v_obs-bb)**2.0/(2.0*cc**2.0))
 
