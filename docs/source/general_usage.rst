@@ -22,7 +22,7 @@ The SALT model represents a solution to the radiation transfer of resonant photo
 Free Parameters
 ***************
 
-.. list-table:: SALT Parameters
+.. list-table::
    :widths: 25 80 25
    :header-rows: 1
 

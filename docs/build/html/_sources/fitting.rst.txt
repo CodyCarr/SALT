@@ -117,7 +117,9 @@ Here we analyize the results of the model fitting.
     v_obs = data[:,0]
     flux = data[:,1]
     error = data[:,2]
-
+    eu = flux+error
+    ed = flux-error
+    
     # get chains 
     chain = np.genfromtxt('0911_chains.txt')
     ndim, nwalkers, steps = 10, 50, 3000
@@ -162,7 +164,7 @@ Here we analyize the results of the model fitting.
     OCCULTATION = True
     APERTURE = True
     flow_parameters = {'alpha':alpha, 'psi':psi, 'gamma':gamma, 'tau':tau, 'v_0':v_0, 'v_w':v_w, 'v_ap':v_ap, 'f_c':f_c, 'k':k, 'delta':delta}
-    profile_parameters = {'abs_waves':[1190.42,1193.28],'abs_osc_strs':[0.277,.575], 'em_waves':[1190.42,1190.42,1193.28,1193.28],'em_osc_strs':[0.277,0.277,0.575,0.575],'res':[True,False,True,False],'fluor':[False,True,False,True],'p_r':[.1592,.1592,.6577,.6577],'p_f':[.8408,.8408,.3423,.3423],'final_waves':[1190.42,1194.5,1193.28,1197.39],'line_num':[2,2], 'v_obs':v_obs,'lam_ref':lam_ref, 'APERTURE':APERTURE,'OCCULTATION':OCCULTATION}
+    profile_parameters = {'abs_waves':[1190.42,1193.28],'abs_osc_strs':[0.277,.575], 'em_waves':[1190.42,1190.42,1193.28,1193.28],'em_osc_strs':[0.277,0.277,0.575,0.575],'res':[True,False,True,False],'fluor':[False,True,False,True],'p_r':[.1592,.1592,.6577,.6577],'p_f':[.8408,.8408,.3423,.3423],'final_waves':[1190.42,1194.5,1193.28,1197.39],'line_num':[2,2], 'v_obs':v_range,'lam_ref':lam_ref, 'APERTURE':APERTURE,'OCCULTATION':OCCULTATION}
     spectrum  = Line_Profile(v_range,lam_ref,background,flow_parameters,profile_parameters)
 
     # smooth and rebin data
@@ -173,13 +175,21 @@ Here we analyize the results of the model fitting.
     from matplotlib import pyplot as plt
 
     fig, ax = plt.subplots(1,1, figsize=(7, 5))
-    ax.plot(v_obs,spectrum,'r',linewidth = 2.0)
+    ax.fill_between(v_obs, eu, ed,alpha = .5,color = 'grey')
+    ax.step(v_obs,flux,'k',linewidth = 2,label='observed')
+    ax.plot(v_obs,spectrum,'r',linewidth = 2.0,label='SALT')
     ax.set_xlabel('Velocity '+r'$[\rm km \ s^{-1}]$',fontsize =20)
     ax.set_ylabel(r'$F/F_0$',fontsize =20)
+    ax.legend(loc='upper left',fontsize = 20,edgecolor = 'white',facecolor = 'white',framealpha=0.8)
     plt.grid()
     plt.tight_layout()
     plt.show()
 
+.. image:: ../../images/res1.png
+  :width: 700
+  :alt: result one
+
+.. code-block:: python
     
     # steps and walkers plots
     fig,(ax1,ax2,ax3,ax4,ax5,ax6,ax7,ax8,ax9,ax10) = plt.subplots(9,1,figsize=(10,8.5))
