@@ -1,10 +1,10 @@
-Introduction
-============
+MCMC Fit
+========
 
 As a semi-analytical model, SALT is designed to compute spectral lines quickly.  When paired with a Monte Carlo sampler, one can constrain the SALT parameter space efficently to determine the properties of galactic outflows and the associated uncertainties.  In this tutorial, we fit SALT to the spectrum of a real galaxy using the Python based Monte Carlo ensemble sampler, emcee (Foreman-Mackey, Hogg, Lang & Goodman 2012).  The goal is to sufficiently sample a likelihood function to quantify the best parameter fit and associated uncertainties.  For this tutorial, we assume a Gaussian likelihood function.  The fitting code is described below.   
 
-Example
-=======
+Example Fit with emcee
+**********************
 .. code-block:: python
 
     import numpy as np
@@ -96,7 +96,7 @@ Example
        main()
 
 Results
-=======
+*******
 
 Here we analyize the results of the model fitting.  
 
