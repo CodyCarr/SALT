@@ -11,7 +11,8 @@ Fitting Code
     import scipy.ndimage.filters as g
     from scipy import interpolate
     import emcee
-
+    import corner
+    
     from SALT2022_LineProfile import Line_Profile
 
     def rebin(x,y,xnew):
@@ -190,64 +191,69 @@ Here we analyize the results of the model fitting.
   :alt: result one
 
 .. code-block:: python
-    
-    # steps and walkers plots
-    fig,(ax1,ax2,ax3,ax4,ax5,ax6,ax7,ax8,ax9,ax10) = plt.subplots(9,1,figsize=(10,8.5))
 
-    ax1.plot((180/np.pi)*gdchain[:,:,0].T,alpha=0.25)
-    ax2.plot((180/np.pi)*gdchain[:,:,1].T,alpha=0.25)
-    ax3.plot(gdchain[:,:,2].T,alpha=0.25)
-    ax4.plot(gdchain[:,:,3].T,alpha=0.25)
-    ax5.plot(gdchain[:,:,4].T,alpha=0.25)
-    ax6.plot(gdchain[:,:,5].T,alpha=0.25)
-    ax7.plot(gdchain[:,:,6].T,alpha=0.25)
-    ax8.plot(gdchain[:,:,7].T,alpha=0.25)
-    ax9.plot(gdchain[:,:,8].T,alpha=0.25)
+    # show steps in parameter space 
+    fig,(ax1,ax2,ax3,ax4,ax5,ax6,ax7,ax8,ax9,ax10) = plt.subplots(10,1,figsize=(10,8.5))
 
-    ax1.set_ylabel(r'$\alpha$',fontsize = 30, labelpad = 18)
-    ax1.set_yticks([15,45,75])
-    ax1.set_yticklabels([15,45,75])
+    ax1.plot((180/np.pi)*alpha_chain.T,alpha=0.25)
+    ax2.plot((180/np.pi)*psi_chain.T,alpha=0.25)
+    ax3.plot(gamma_chain.T,alpha=0.25)
+    ax4.plot(tau_chain.T,alpha=0.25)
+    ax5.plot(v_0_chain.T,alpha=0.25)
+    ax6.plot(v_w_chain.T,alpha=0.25)
+    ax7.plot(f_c_chain.T,alpha=0.25)
+    ax8.plot(k_chain.T,alpha=0.25)
+    ax9.plot(delta_chain.T,alpha=0.25)
+    ax10.plot(v_ap_chain.T,alpha=0.25)
+
+    # alpha                                                                                                                                                                        
+    ax1.set_yticks([0,30,60,90])
+    ax1.set_yticklabels([0,30,60,90])
     ax1.set_xticklabels([])
 
-    ax2.set_ylabel(r'$\psi$',fontsize = 30, labelpad = 18)
-    ax2.set_yticks([15,45,75])
-    ax2.set_yticklabels([15,45,75])
+    # psi                                                                                                                                                                          
+    ax2.set_yticks([0,30,60,90])
+    ax2.set_yticklabels([0,30,60,90])
     ax2.set_xticklabels([])
 
-    ax3.set_ylabel(r'$\gamma$',fontsize = 30, labelpad = 25)
-    ax3.set_yticks([.5,1,1.5])
-    ax3.set_yticklabels([.5,1,1.5])
+    # gamma                                                                                                                                                                        
+    ax3.set_yticks([0,0.5,1.0,1.5,2])
+    ax3.set_yticklabels([0,0.5,1.0,1.5,2])
     ax3.set_xticklabels([])
 
-    ax4.set_ylabel(r'$\tau$',fontsize = 30, labelpad = 18)
-    ax4.set_yticks([20,40,60,80])
-    ax4.set_yticklabels([20,40,60,80])
+    # tau                                                                                                                                                                          
+    ax4.set_yticks([-2,-1,0,1,2,3])
+    ax4.set_yticklabels([-2,-1,0,1,2,3])
     ax4.set_xticklabels([])
 
-    ax5.set_ylabel(r'$v_0$',fontsize = 30, labelpad = 20)
-    ax5.set_yticks([40,80,120])
-    ax5.set_yticklabels([40,80,120])
+    # v_0                                                                                                                                                                          
+    ax5.set_yticks([0,50,100,150])
+    ax5.set_yticklabels([0,50,100,150])
     ax5.set_xticklabels([])
 
-    ax6.set_ylabel(r'$v_{\infty}$',fontsize = 30)
-    ax6.set_yticks([500,1000,1500,2000])
-    ax6.set_yticklabels([500,1000,1500,2000])
+    # v_w                                                                                                                                                                          
+    ax6.set_yticks([0,500,1000,1500,2000,2500])
+    ax6.set_yticklabels([0,500,1000,1500,2000,2500])
     ax6.set_xticklabels([])
 
-    ax7.set_ylabel(r'$f_c$',fontsize = 30, labelpad = 18)
-    ax7.set_yticks([.2,.4,.6,.8])
-    ax7.set_yticklabels([.2,.4,.6,.8])
+    # f_c                                                                                                                                                                          
+    ax7.set_yticks([0,.25,.5,.75,1])
+    ax7.set_yticklabels([0,0.25,0.5,0.75,1.0])
     ax7.set_xticklabels([])
 
-    ax8.set_ylabel(r'$\kappa$',fontsize = 30, labelpad = 18)
-    ax8.set_yticks([1,2,3,4,5])#20,40,60,80])                                                                                                         
-    ax8.set_yticklabels([1,2,3,4,5])
-    ax8.set_ylim([0,5])
-    
-    ax9.set_ylabel(r'$\delta$',fontsize = 30, labelpad = 18)
-    ax9.set_yticks([2,4,6,8])#20,40,60,80])                                                                                                          
+    # kappa                                                                                                                                                                       
+    ax8.set_yticks([-2,-1,0,1,2])
+    ax8.set_yticklabels([-2,-1,0,1,2])
+    ax8.set_xticklabels([])
+
+    # delta                                                                                                                                                                        
+    ax9.set_yticks([2,4,6,8])
     ax9.set_yticklabels([2,4,6,8])
-    ax9.set_ylim([0,8])
+    ax9.set_xticklabels([])
+
+    # v_ap                                                                                                                                                                         
+    ax10.set_yticks([0,500,1000,1500,2000,2500])
+    ax10.set_yticklabels([0,500,1000,1500,2000,2500])
 
     ax1.set_ylabel(r'$\alpha$',fontsize = 30)
     ax2.set_ylabel(r'$\psi$',fontsize = 30)
@@ -258,14 +264,25 @@ Here we analyize the results of the model fitting.
     ax7.set_ylabel(r'$f_c$',fontsize = 30)
     ax8.set_ylabel(r'$\kappa$',fontsize = 30)
     ax9.set_ylabel(r'$\delta$',fontsize = 30)
+    ax10.set_ylabel(r'$v_{ap}$',fontsize = 30)
 
     for ax in [ax1,ax2,ax3,ax4,ax5,ax6,ax7,ax8,ax9]:
        ax.set_xlabel('Number of Steps',fontsize = 30)
        fig = plt.gcf()
     plt.show()
-    plt.close(fig)
 
-    # pdfs 
+.. image:: ../../images/res2.png
+  :width: 700
+  :alt: result one
 
-    import triangle
-    tmp = triangle.corner(sampler.flatchain, labels=['alpha','betax','betay','eps'],truths=[alpha_true, beta_x_true, beta_y_true, eps_true])
+.. code-block:: python
+	
+    # marginal pdfs 
+    import corner
+    samples = chain[:,500:,:].reshape((-1, ndim))
+    fig = corner.corner(samples, labels=[r'$\alpha$',r'$\psi$',r'$\gamma$',r'$\tau$',r'$v_0$',r'$v_{\infty}$',r'$f_c$',r'$\kappa$',r'$\delta$',r'$v_{ap}$'],truths=[alpha, psi, gamma, tau, v_0, v_w, f_c, k, delta, v_ap])
+    fig.savefig("pdfs.png")
+
+.. image:: ../../images/res3.png
+  :width: 700
+  :alt: result one
