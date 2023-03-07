@@ -67,15 +67,15 @@ Fitting Code
        np.savetxt('max_likelihood_pars.txt',sampler.get_log_prob().reshape((-1, nwalkers)))
 
 
-    data = np.loadtxt('../../1244+0216.txt')
-    v_obs = data[:0]
-    flux = data[:1]
-    error = data[:2]
+    data = np.loadtxt('0911+1831.txt')
+    v_obs = data[:,0]
+    flux = data[:,1]
+    error = data[:,2]
     
     lam_ref = 1193.28
     v_range = np.linspace(int(v_obs[0])-1.0,int(v_obs[-1])+1,1500)
 
-    res = 25.0/(v_range[1]-v_range[0])
+    res = 30.0/(v_range[1]-v_range[0])
 
     ndim, nwalkers, steps = 10, 50, 3000
     p0 = np.random.rand(nwalkers,ndim)
@@ -101,15 +101,29 @@ Here we analyize the results of the model fitting.
 
 .. code-block:: python
 
-    chain = np.genfromtxt('/Users/codycarr/Desktop/Xshooter/xshooter/spectra2/'+names[s]+'/chain_pars.txt')
+    import numpy as np
+    import scipy.ndimage.filters as g
+    from scipy import interpolate
+    from matplotlib import pyplot as plt
+    from SALT2022_LineProfile import Line_Profile
+
+    def rebin(x,y,xnew):
+       f = interpolate.interp1d(x,y)
+       ynew = f(xnew)
+       return ynew
+
+    # get data
+    data = np.loadtxt('0911+1831.txt')
+    v_obs = data[:,0]
+    flux = data[:,1]
+    error = data[:,2]
+
+    # get chains 
+    chain = np.genfromtxt('0911_chains.txt')
     ndim, nwalkers, steps = 10, 50, 3000
     chain = np.reshape(chain,(nwalkers,steps,ndim))
 
-    likelihood = np.genfromtxt('/Users/codycarr/Desktop/Xshooter/xshooter/spectra2/'+names[s]+'/max_likelihood_pars.txt')
-    likelihood = likelihood.ravel()
-
-    best_fit_index = np.where(likelihood == max(likelihood))[0][0]
-
+    # collect chains
     alpha_chain = chain[:,:,0]
     psi_chain = chain[:,:,1]
     gamma_chain = chain[:,:,2]
@@ -120,42 +134,42 @@ Here we analyize the results of the model fitting.
     k_chain = 10.0**chain[:,:,7]
     delta_chain = chain[:,:,8]+chain[:,:,2]+2.0
     v_ap_chain = chain[:,:,9]
-    
-    alpha_array = np.array(alpha_chain.ravel())
-    psi_array = np.array(psi_chain.ravel())
-    gamma_array = np.array(gamma_chain.ravel())
-    tau_array = np.array(tau_chain.ravel())
-    v_0_array = np.array(v_0_chain.ravel())
-    v_w_array = np.array(v_w_chain.ravel())
-    f_c_array = np.array(f_c_chain.ravel())
-    k_array = np.array(k_chain.ravel())
-    delta_array = np.array(delta_chain.ravel())
-    v_ap_array = np.array(v_ap_chain.ravel())
 
-    best_fit = [alpha_array[best_fit_index],psi_array[best_fit_index],gamma_array[best_fit_index],tau_array[best_fit_index],v_0_array[best_fit_index],v_w_array[best_fit_index],f_c_array[best_fit_index],k_array[best_fit_index],delta_array[best_fit_index],v_ap_array[best_fit_index]]
+    # convert chains to arrays
+    alpha_arr = np.array(alpha_chain.ravel())
+    psi_arr = np.array(psi_chain.ravel())
+    gamma_arr = np.array(gamma_chain.ravel())
+    tau_arr = np.array(tau_chain.ravel())
+    v_0_arr = np.array(v_0_chain.ravel())
+    v_w_arr = np.array(v_w_chain.ravel())
+    f_c_arr = np.array(f_c_chain.ravel())
+    k_arr = np.array(k_chain.ravel())
+    delta_arr = np.array(delta_chain.ravel())
+    v_ap_arr = np.array(v_ap_chain.ravel())
 
-    # best fit plot
+    # find best	fit from likelihood samples
+    likelihood = np.genfromtxt('0911_likelihoods.txt').ravel()
+    bf_ind = np.where(likelihood == max(likelihood))[0][0]
+    best_fit = [alpha_arr[bf_ind],psi_arr[bf_ind],gamma_arr[bf_ind],tau_arr[bf_ind],v_0_arr[bf_ind],v_w_arr[bf_ind],f_c_arr[bf_ind],k_arr[bf_ind],delta_arr[bf_ind],v_ap_arr[bf_ind]]
 
-    alpha = best_fit[0]
-    psi = best_fit[1]
-    gamma = best_fit[2]
-    tau = best_fit[3]
-    v_0 = best_fit[4]
-    v_w = best_fit[5]
-    f_c = best_fit[6]
-    k = best_fit[7]
-    delta = best_fit[8]
-    v_ap = best_fit[9]
+    # best fit SALT parameters
+    alpha,psi,gamma,tau,v_0,v_w,f_c,k,delta,v_ap = best_fit
 
+    # compute SALT
     lam_ref = 1193.28
-    v_obs = np.linspace(-2000,2000,1000)
-    background = np.ones_like(v_obs)
+    v_range = np.linspace(int(v_obs[0])-1.0,int(v_obs[-1])+1,1500)
+    background = np.ones_like(v_range)
     OCCULTATION = True
     APERTURE = True
     flow_parameters = {'alpha':alpha, 'psi':psi, 'gamma':gamma, 'tau':tau, 'v_0':v_0, 'v_w':v_w, 'v_ap':v_ap, 'f_c':f_c, 'k':k, 'delta':delta}
     profile_parameters = {'abs_waves':[1190.42,1193.28],'abs_osc_strs':[0.277,.575], 'em_waves':[1190.42,1190.42,1193.28,1193.28],'em_osc_strs':[0.277,0.277,0.575,0.575],'res':[True,False,True,False],'fluor':[False,True,False,True],'p_r':[.1592,.1592,.6577,.6577],'p_f':[.8408,.8408,.3423,.3423],'final_waves':[1190.42,1194.5,1193.28,1197.39],'line_num':[2,2], 'v_obs':v_obs,'lam_ref':lam_ref, 'APERTURE':APERTURE,'OCCULTATION':OCCULTATION}
-    spectrum  = Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters)
+    spectrum  = Line_Profile(v_range,lam_ref,background,flow_parameters,profile_parameters)
 
+    # smooth and rebin data
+    res = 30.0/(v_range[1]-v_range[0])
+    spectrum = np.array(g.gaussian_filter1d(spectrum,res))
+    spectrum = rebin(v_range,spectrum,v_obs)
+    
     from matplotlib import pyplot as plt
 
     fig, ax = plt.subplots(1,1, figsize=(7, 5))
