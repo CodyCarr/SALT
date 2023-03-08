@@ -12,16 +12,20 @@ Fitting with MCMC
     from scipy import interpolate
     import emcee
     import corner
-    
+    #import sys 
+    #sys.path.insert(0, 'path')
     from SALT2022_LineProfile import Line_Profile
 
+    # rebin data
     def rebin(x,y,xnew):
        f = interpolate.interp1d(x,y)
        ynew = f(xnew)
        return ynew
 
+    # likelihood
     def lnlike(pars, y, yerr):
 
+       # SALT parameters
        alpha,psi,gamma, tau, v_0, v_w, f_c, k, delta, v_ap = pars
        
        tau = 10.0**tau
@@ -36,10 +40,12 @@ Fitting with MCMC
        flow_parameters = {'alpha':alpha, 'psi':psi, 'gamma':gamma, 'tau':tau, 'v_0':v_0, 'v_w':v_w, 'v_ap':v_ap, 'f_c':f_c, 'k':k, 'delta':delta}
        profile_parameters = {'abs_waves':[1190.42,1193.28],'abs_osc_strs':[0.277,.575], 'em_waves':[1190.42,1190.42,1193.28,1193.28],'em_osc_strs':[0.277,0.277,0.575,0.575],'res':[True,False,True,False],'fluor':[False,True,False,True],'p_r':[.1592,.1592,.6577,.6577],'p_f':[.8408,.8408,.3423,.3423],'final_waves':[1190.42,1194.5,1193.28,1197.39],'line_num':[2,2], 'v_obs':v_range,'lam_ref':lam_ref, 'APERTURE':APERTURE,'OCCULTATION':OCCULTATION}
 
+       # SALT is first run on a higher resolution array, then smoothed and rebinned to match the data
        model = Line_Profile(v_range,lam_ref,background,flow_parameters,profile_parameters)
        model = np.array(g.gaussian_filter1d(model,res))
        model = rebin(v_range,model,v_obs)
 
+       # log Gaussian likelihood
        result = 0
        for i in range(len(list(y))):
           sigma = 1.0/yerr[i]**2.0
@@ -47,18 +53,21 @@ Fitting with MCMC
        result = -.5*result
        return result
 
+    # prior probability
     def lnprior(pars):
        alpha,psi,gamma,tau,v_0,v_w,f_c,k,delta,v_ap = pars
        if 0<alpha<np.pi/2.0 and 0<psi<np.pi/2.0 and 0.5<gamma<2.0 and -2<tau<3 and 2.0<v_0<150.0 and 200.0<v_w<1500.0 and 0<f_c<1 and -2.0<k<2.0 and -1.5<delta<1.5 and 0<v_ap<1500:
           return 0
        return -np.Inf
 
+    # full probability
     def lnprob(pars,y,yerr):
        lnp = lnprior(pars)
        if not np.isfinite(lnp):
           return -np.Inf
        return lnp + lnlike(pars,y,yerr)
-       
+
+    # run emcee
     def main():
        sampler = emcee.EnsembleSampler(nwalkers, ndim, lnprob, args=(np.array(flux), np.array(error)), pool=Pool(max_workers = 25))
        start_time = time.time()
@@ -67,17 +76,18 @@ Fitting with MCMC
        np.savetxt('chain_pars.txt',sampler.chain.reshape((-1, ndim)))
        np.savetxt('max_likelihood_pars.txt',sampler.get_log_prob().reshape((-1, nwalkers)))
 
-
+    # get data to fit
     data = np.loadtxt('0911+1831.txt')
     v_obs = data[:,0]
     flux = data[:,1]
     error = data[:,2]
-    
-    lam_ref = 1193.28
-    v_range = np.linspace(int(v_obs[0])-1.0,int(v_obs[-1])+1,1500)
 
+    # SALT is first run on a higher resolution array, then smoothed and rebinned to match data
+    lam_ref = 1193.28
+    v_range = np.linspace(-2500,2500,1500)
     res = 30.0/(v_range[1]-v_range[0])
 
+    # randomly generates initial conditions
     ndim, nwalkers, steps = 10, 50, 3000
     p0 = np.random.rand(nwalkers,ndim)
 
