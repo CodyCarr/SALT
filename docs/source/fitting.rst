@@ -1,10 +1,10 @@
-MCMC Fit
-========
+Example Fit
+===========
 
-As a semi-analytical model, SALT is designed to compute spectral lines quickly.  When paired with a Monte Carlo sampler, one can constrain the SALT parameter space efficently to determine the properties of galactic outflows and the associated uncertainties.  In this tutorial, we fit SALT to the spectrum of a real galaxy using the Python based Monte Carlo ensemble sampler, emcee (Foreman-Mackey, Hogg, Lang & Goodman 2012).  The goal is to sufficiently sample a likelihood function to quantify the best parameter fit and associated uncertainties.  For this tutorial, we assume a Gaussian likelihood function.  The fitting code is described below.   
+As a semi-analytical model, SALT is designed to compute spectral lines quickly.  When paired with a Monte Carlo sampler, one can constrain the SALT parameter space efficently to determine the properties of galactic outflows and the associated uncertainties.  In this tutorial, we fit SALT to the spectrum of a real galaxy using the Python based Markov Chain Monte Carlo (MCMC) ensemble sampler, emcee (Foreman-Mackey, Hogg, Lang & Goodman 2012).  The goal is to sufficiently sample a likelihood function to quantify the best parameter fit and associated uncertainties.  For this tutorial, we assume a Gaussian likelihood function.  The fitting code is described below.   
 
-Example Fit with emcee
-**********************
+Fitting with MCMC
+*****************
 .. code-block:: python
 
     import numpy as np
@@ -49,7 +49,7 @@ Example Fit with emcee
 
     def lnprior(pars):
        alpha,psi,gamma,tau,v_0,v_w,f_c,k,delta,v_ap = pars
-       if 0<alpha<np.pi/2.0 and 0<psi<np.pi/2.0 and 0.5<gamma<2.0 and -2<tau<3 and 2.0<v_0<150.0 and 200.0<v_w<2500.0 and 0<f_c<1 and -2.0<k<2.0 and 0.5<delta<8.0 and 0<v_ap<2500:
+       if 0<alpha<np.pi/2.0 and 0<psi<np.pi/2.0 and 0.5<gamma<2.0 and -2<tau<3 and 2.0<v_0<150.0 and 200.0<v_w<1500.0 and 0<f_c<1 and -2.0<k<2.0 and -1.5<delta<1.5 and 0<v_ap<1500:
           return 0
        return -np.Inf
 
@@ -277,7 +277,7 @@ Here we analyize the results of the model fitting.
 
 .. code-block:: python
 	
-    # marginal pdfs 
+    # marginal pdfs, removed 'burning phase', best fit shown in blue
     import corner
     samples = chain[:,500:,:].reshape((-1, ndim))
     fig = corner.corner(samples, labels=[r'$\alpha$',r'$\psi$',r'$\gamma$',r'$\tau$',r'$v_0$',r'$v_{\infty}$',r'$f_c$',r'$\kappa$',r'$\delta$',r'$v_{ap}$'],truths=[alpha, psi, gamma, tau, v_0, v_w, f_c, k, delta, v_ap])

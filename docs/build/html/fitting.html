@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MCMC Fit &mdash; SALT Model 1.0.0 documentation</title>
+  <title>Example Fit &mdash; SALT Model 1.0.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -51,8 +51,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Fitting to Data</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">MCMC Fit</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#example-fit-with-emcee">Example Fit with emcee</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Example Fit</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#fitting-with-mcmc">Fitting with MCMC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#results">Results</a></li>
 </ul>
 </li>
@@ -60,6 +60,10 @@
 <p class="caption" role="heading"><span class="caption-text">The Code</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">SALT</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="resources.html">Publications</a></li>
 </ul>
 
         </div>
@@ -76,7 +80,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">MCMC Fit</li>
+      <li class="breadcrumb-item active">Example Fit</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/fitting.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -86,11 +90,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="mcmc-fit">
-<h1>MCMC Fit<a class="headerlink" href="#mcmc-fit" title="Permalink to this heading"></a></h1>
-<p>As a semi-analytical model, SALT is designed to compute spectral lines quickly.  When paired with a Monte Carlo sampler, one can constrain the SALT parameter space efficently to determine the properties of galactic outflows and the associated uncertainties.  In this tutorial, we fit SALT to the spectrum of a real galaxy using the Python based Monte Carlo ensemble sampler, emcee (Foreman-Mackey, Hogg, Lang &amp; Goodman 2012).  The goal is to sufficiently sample a likelihood function to quantify the best parameter fit and associated uncertainties.  For this tutorial, we assume a Gaussian likelihood function.  The fitting code is described below.</p>
-<section id="example-fit-with-emcee">
-<h2>Example Fit with emcee<a class="headerlink" href="#example-fit-with-emcee" title="Permalink to this heading"></a></h2>
+  <section id="example-fit">
+<h1>Example Fit<a class="headerlink" href="#example-fit" title="Permalink to this heading"></a></h1>
+<p>As a semi-analytical model, SALT is designed to compute spectral lines quickly.  When paired with a Monte Carlo sampler, one can constrain the SALT parameter space efficently to determine the properties of galactic outflows and the associated uncertainties.  In this tutorial, we fit SALT to the spectrum of a real galaxy using the Python based Markov Chain Monte Carlo (MCMC) ensemble sampler, emcee (Foreman-Mackey, Hogg, Lang &amp; Goodman 2012).  The goal is to sufficiently sample a likelihood function to quantify the best parameter fit and associated uncertainties.  For this tutorial, we assume a Gaussian likelihood function.  The fitting code is described below.</p>
+<section id="fitting-with-mcmc">
+<h2>Fitting with MCMC<a class="headerlink" href="#fitting-with-mcmc" title="Permalink to this heading"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.ndimage.filters</span> <span class="k">as</span> <span class="nn">g</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interpolate</span>
@@ -133,7 +137,7 @@
 
 <span class="k">def</span> <span class="nf">lnprior</span><span class="p">(</span><span class="n">pars</span><span class="p">):</span>
    <span class="n">alpha</span><span class="p">,</span><span class="n">psi</span><span class="p">,</span><span class="n">gamma</span><span class="p">,</span><span class="n">tau</span><span class="p">,</span><span class="n">v_0</span><span class="p">,</span><span class="n">v_w</span><span class="p">,</span><span class="n">f_c</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">delta</span><span class="p">,</span><span class="n">v_ap</span> <span class="o">=</span> <span class="n">pars</span>
-   <span class="k">if</span> <span class="mi">0</span><span class="o">&lt;</span><span class="n">alpha</span><span class="o">&lt;</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">2.0</span> <span class="ow">and</span> <span class="mi">0</span><span class="o">&lt;</span><span class="n">psi</span><span class="o">&lt;</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">2.0</span> <span class="ow">and</span> <span class="mf">0.5</span><span class="o">&lt;</span><span class="n">gamma</span><span class="o">&lt;</span><span class="mf">2.0</span> <span class="ow">and</span> <span class="o">-</span><span class="mi">2</span><span class="o">&lt;</span><span class="n">tau</span><span class="o">&lt;</span><span class="mi">3</span> <span class="ow">and</span> <span class="mf">2.0</span><span class="o">&lt;</span><span class="n">v_0</span><span class="o">&lt;</span><span class="mf">150.0</span> <span class="ow">and</span> <span class="mf">200.0</span><span class="o">&lt;</span><span class="n">v_w</span><span class="o">&lt;</span><span class="mf">2500.0</span> <span class="ow">and</span> <span class="mi">0</span><span class="o">&lt;</span><span class="n">f_c</span><span class="o">&lt;</span><span class="mi">1</span> <span class="ow">and</span> <span class="o">-</span><span class="mf">2.0</span><span class="o">&lt;</span><span class="n">k</span><span class="o">&lt;</span><span class="mf">2.0</span> <span class="ow">and</span> <span class="mf">0.5</span><span class="o">&lt;</span><span class="n">delta</span><span class="o">&lt;</span><span class="mf">8.0</span> <span class="ow">and</span> <span class="mi">0</span><span class="o">&lt;</span><span class="n">v_ap</span><span class="o">&lt;</span><span class="mi">2500</span><span class="p">:</span>
+   <span class="k">if</span> <span class="mi">0</span><span class="o">&lt;</span><span class="n">alpha</span><span class="o">&lt;</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">2.0</span> <span class="ow">and</span> <span class="mi">0</span><span class="o">&lt;</span><span class="n">psi</span><span class="o">&lt;</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">2.0</span> <span class="ow">and</span> <span class="mf">0.5</span><span class="o">&lt;</span><span class="n">gamma</span><span class="o">&lt;</span><span class="mf">2.0</span> <span class="ow">and</span> <span class="o">-</span><span class="mi">2</span><span class="o">&lt;</span><span class="n">tau</span><span class="o">&lt;</span><span class="mi">3</span> <span class="ow">and</span> <span class="mf">2.0</span><span class="o">&lt;</span><span class="n">v_0</span><span class="o">&lt;</span><span class="mf">150.0</span> <span class="ow">and</span> <span class="mf">200.0</span><span class="o">&lt;</span><span class="n">v_w</span><span class="o">&lt;</span><span class="mf">1500.0</span> <span class="ow">and</span> <span class="mi">0</span><span class="o">&lt;</span><span class="n">f_c</span><span class="o">&lt;</span><span class="mi">1</span> <span class="ow">and</span> <span class="o">-</span><span class="mf">2.0</span><span class="o">&lt;</span><span class="n">k</span><span class="o">&lt;</span><span class="mf">2.0</span> <span class="ow">and</span> <span class="o">-</span><span class="mf">1.5</span><span class="o">&lt;</span><span class="n">delta</span><span class="o">&lt;</span><span class="mf">1.5</span> <span class="ow">and</span> <span class="mi">0</span><span class="o">&lt;</span><span class="n">v_ap</span><span class="o">&lt;</span><span class="mi">1500</span><span class="p">:</span>
       <span class="k">return</span> <span class="mi">0</span>
    <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">Inf</span>
 
@@ -351,7 +355,7 @@
 </pre></div>
 </div>
 <a class="reference internal image-reference" href="_images/res2.png"><img alt="result one" src="_images/res2.png" style="width: 700px;" /></a>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># marginal pdfs</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># marginal pdfs, removed &#39;burning phase&#39;, best fit shown in blue</span>
 <span class="kn">import</span> <span class="nn">corner</span>
 <span class="n">samples</span> <span class="o">=</span> <span class="n">chain</span><span class="p">[:,</span><span class="mi">500</span><span class="p">:,:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">ndim</span><span class="p">))</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">corner</span><span class="o">.</span><span class="n">corner</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="sa">r</span><span class="s1">&#39;$\alpha$&#39;</span><span class="p">,</span><span class="sa">r</span><span class="s1">&#39;$\psi$&#39;</span><span class="p">,</span><span class="sa">r</span><span class="s1">&#39;$\gamma$&#39;</span><span class="p">,</span><span class="sa">r</span><span class="s1">&#39;$\tau$&#39;</span><span class="p">,</span><span class="sa">r</span><span class="s1">&#39;$v_0$&#39;</span><span class="p">,</span><span class="sa">r</span><span class="s1">&#39;$v_{\infty}$&#39;</span><span class="p">,</span><span class="sa">r</span><span class="s1">&#39;$f_c$&#39;</span><span class="p">,</span><span class="sa">r</span><span class="s1">&#39;$\kappa$&#39;</span><span class="p">,</span><span class="sa">r</span><span class="s1">&#39;$\delta$&#39;</span><span class="p">,</span><span class="sa">r</span><span class="s1">&#39;$v_</span><span class="si">{ap}</span><span class="s1">$&#39;</span><span class="p">],</span><span class="n">truths</span><span class="o">=</span><span class="p">[</span><span class="n">alpha</span><span class="p">,</span> <span class="n">psi</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">v_0</span><span class="p">,</span> <span class="n">v_w</span><span class="p">,</span> <span class="n">f_c</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">v_ap</span><span class="p">])</span>

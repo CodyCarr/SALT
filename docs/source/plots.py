@@ -12,7 +12,7 @@ def rebin(x,y,xnew):
    return ynew
 
 # get data
-data = np.loadtxt('../../1244+0216.txt')
+data = np.loadtxt('../../0911+1831.txt')
 v_obs = data[:,0]
 flux = data[:,1]
 error = data[:,2]
@@ -20,7 +20,7 @@ eu = flux+error
 ed = flux-error
 
 # get chains
-chain = np.genfromtxt('chain_pars.txt')
+chain = np.genfromtxt('0911_chains.txt')
 ndim, nwalkers, steps = 10, 50, 3000
 chain = np.reshape(chain,(nwalkers,steps,ndim))
 
@@ -49,7 +49,7 @@ delta_arr = np.array(delta_chain.ravel())
 v_ap_arr = np.array(v_ap_chain.ravel())
 
 # find best fit from likelihood samples
-likelihood = np.genfromtxt('max_likelihood_pars.txt').ravel()
+likelihood = np.genfromtxt('0911_likelihoods.txt').ravel()
 bf_ind = np.where(likelihood == max(likelihood))[0][0]
 best_fit = [alpha_arr[bf_ind],psi_arr[bf_ind],gamma_arr[bf_ind],tau_arr[bf_ind],v_0_arr[bf_ind],v_w_arr[bf_ind],f_c_arr[bf_ind],k_arr[bf_ind],delta_arr[bf_ind],v_ap_arr[bf_ind]]
 
@@ -58,11 +58,12 @@ alpha,psi,gamma,tau,v_0,v_w,f_c,k,delta,v_ap = best_fit
 
 # compute SALT
 lam_ref = 1193.28
-v_range = np.linspace(int(v_obs[0])-1.0,int(v_obs[-1])+1,1500)
+v_range = np.linspace(-2500,2500,1500)#np.linspace(int(v_obs[0])-1.0,int(v_obs[-1])+1,1500)
 background = np.ones_like(v_range)
 OCCULTATION = True
 APERTURE = True
 flow_parameters = {'alpha':alpha, 'psi':psi, 'gamma':gamma, 'tau':10**tau, 'v_0':v_0, 'v_w':v_w, 'v_ap':v_ap, 'f_c':f_c, 'k':10**k, 'delta':delta}
+print(flow_parameters)
 profile_parameters = {'abs_waves':[1190.42,1193.28],'abs_osc_strs':[0.277,.575], 'em_waves':[1190.42,1190.42,1193.28,1193.28],'em_osc_strs':[0.277,0.277,0.575,0.575],'res':[True,False,True,False],'fluor':[False,True,False,True],'p_r':[.1592,.1592,.6577,.6577],'p_f':[.8408,.8408,.3423,.3423],'final_waves':[1190.42,1194.5,1193.28,1197.39],'line_num':[2,2], 'v_obs':v_range,'lam_ref':lam_ref, 'APERTURE':APERTURE,'OCCULTATION':OCCULTATION}
 spectrum  = Line_Profile(v_range,lam_ref,background,flow_parameters,profile_parameters)
 

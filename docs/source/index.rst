@@ -41,6 +41,8 @@ We are open to and encourage collaboration.
    :maxdepth: 2
    :caption: Resources
 
+   resources
+	     
 Index
 =====
 
