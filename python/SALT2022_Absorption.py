@@ -9,9 +9,9 @@ def get_Y_1_Root(y,x,Gamma10):
 	y_1_poly = y**2.0*(1.0-y**Gamma10)-x**2.0  
 	return y_1_poly
 
-def get_Y_1AP_Root(y,x,y_ap,Gamma2,Gamma5):
-	y_1_poly_ap = y**Gamma5*x**2.0+y_ap**Gamma2-y**Gamma2
-	return y_1_poly_ap
+def get_Y_1AP_Root(y,x,y_ap,Gamma2,Gamma5):        
+    y_1_poly_ap = y**Gamma5*x**2.0+y_ap**Gamma2-y**Gamma2
+    return y_1_poly_ap
 
 def get_Absorption_Profile_GIV(y,x,tau,f_holes,A,G,H,O,P,R,Gamma1,Gamma2,Gamma3,Gamma4,Gamma6,Gamma7,Gamma8,Gamma9):
 

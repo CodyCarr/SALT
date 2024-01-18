@@ -37,11 +37,13 @@ Fitting with MCMC
        OCCULTATION = True
        APERTURE = True
 
+       profile_type = 'pcygni'
+
        flow_parameters = {'alpha':alpha, 'psi':psi, 'gamma':gamma, 'tau':tau, 'v_0':v_0, 'v_w':v_w, 'v_ap':v_ap, 'f_c':f_c, 'k':k, 'delta':delta}
        profile_parameters = {'abs_waves':[1190.42,1193.28],'abs_osc_strs':[0.277,.575], 'em_waves':[1190.42,1190.42,1193.28,1193.28],'em_osc_strs':[0.277,0.277,0.575,0.575],'res':[True,False,True,False],'fluor':[False,True,False,True],'p_r':[.1592,.1592,.6577,.6577],'p_f':[.8408,.8408,.3423,.3423],'final_waves':[1190.42,1194.5,1193.28,1197.39],'line_num':[2,2], 'v_obs':v_range,'lam_ref':lam_ref, 'APERTURE':APERTURE,'OCCULTATION':OCCULTATION}
 
        # SALT is first run on a higher resolution array, then smoothed and rebinned to match the data
-       model = Line_Profile(v_range,lam_ref,background,flow_parameters,profile_parameters)
+       model = Line_Profile(v_range,lam_ref,background,flow_parameters,profile_parameters,profile_type)
        model = np.array(g.gaussian_filter1d(model,res))
        model = rebin(v_range,model,v_obs)
 
@@ -148,25 +150,23 @@ Here we analyize the results of the model fitting.
     delta_chain = chain[:,:,8]+chain[:,:,2]+2.0
     v_ap_chain = chain[:,:,9]
 
-    # convert chains to arrays
-    alpha_arr = np.array(alpha_chain.ravel())
-    psi_arr = np.array(psi_chain.ravel())
-    gamma_arr = np.array(gamma_chain.ravel())
-    tau_arr = np.array(tau_chain.ravel())
-    v_0_arr = np.array(v_0_chain.ravel())
-    v_w_arr = np.array(v_w_chain.ravel())
-    f_c_arr = np.array(f_c_chain.ravel())
-    k_arr = np.array(k_chain.ravel())
-    delta_arr = np.array(delta_chain.ravel())
-    v_ap_arr = np.array(v_ap_chain.ravel())
-
-    # find best	fit from likelihood samples
+    # find best fit from likelihood samples
     likelihood = np.genfromtxt('0911_likelihoods.txt').ravel()
-    bf_ind = np.where(likelihood == max(likelihood))[0][0]
-    best_fit = [alpha_arr[bf_ind],psi_arr[bf_ind],gamma_arr[bf_ind],tau_arr[bf_ind],v_0_arr[bf_ind],v_w_arr[bf_ind],f_c_arr[bf_ind],k_arr[bf_ind],delta_arr[bf_ind],v_ap_arr[bf_ind]]
+    bf_index = np.where(likelihood == max(likelihood))[0][0]
+    f1=int(bf_index%nwalkers)
+    f2=int((bf_index-f1)/nwalkers)
 
-    # best fit SALT parameters
-    alpha,psi,gamma,tau,v_0,v_w,f_c,k,delta,v_ap = best_fit
+    # best fit SALT parameters 
+    alpha = chain[f1,f2,0]
+    psi = chain[f1,f2,1]
+    gamma = chain[f1,f2,2]
+    tau = 10**chain[f1,f2,3]
+    v_0 = chain[f1,f2,4]
+    v_w = chain[f1,f2,5]
+    f_c = chain[f1,f2,6]
+    k = 10**chain[f1,f2,7]
+    delta = chain[f1,f2,8]+chain[f1,f2,2]+2.0
+    v_ap= chain[f1,f2,9]
 
     # compute SALT
     lam_ref = 1193.28

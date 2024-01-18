@@ -62,7 +62,7 @@ def makeEmissionPROFILE(waves,lam_ref,v_obs,SALT_parameters,Emission_Profiles):
 
     return line_profiles
 
-def Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters):
+def Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters,profile_type):
 
     abs_waves,abs_osc_strs,em_waves,em_osc_strs,res,fluor,p_r,p_f,final_waves,line_num,v_obs, lam_ref, APERTURE, OCCULTATION = profile_parameters.values()
     alpha,psi,gamma,tau,v_0,v_w,v_ap,f_c,k,delta = flow_parameters.values()
@@ -90,6 +90,12 @@ def Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters):
         
     Emission = makeEmissionPROFILE(final_waves,lam_ref,v_obs,parameters_em,Emission_Profiles)
     Absorption = Normalized_Flux_Lists[-1]
-    spectrum = Absorption+Emission
+
+    if profile_type == 'absorption':
+        return Absorption
+    elif profile_type == 'emission':
+        return Emission
+    else:
+        return Absorption+Emission
 
     return spectrum
