@@ -88,6 +88,9 @@ The SALT model code consists of three python scripts: SALT2022_Absorption.py, SA
     OCCULTATION = True
     APERTURE = True
 
+    # type of line profile (absorption, emission, or pcygni)
+    profile_type = 'pcygni'
+
     # Outflow parameters
     flow_parameters = {'alpha':alpha, 'psi':psi, 'gamma':gamma, 'tau':tau, 'v_0':v_0, 'v_w':v_w, 'v_ap':v_ap, 'f_c':f_c, 'k':k, 'delta':delta}
 
@@ -105,7 +108,7 @@ The SALT model code consists of three python scripts: SALT2022_Absorption.py, SA
     profile_parameters = {'abs_waves':[1190.42,1193.28],'abs_osc_strs':[0.277,.575], 'em_waves':[1190.42,1190.42,1193.28,1193.28],'em_osc_strs':[0.277,0.277,0.575,0.575],'res':[True,False,True,False],'fluor':[False,True,False,True],'p_r':[.1592,.1592,.6577,.6577],'p_f':[.8408,.8408,.3423,.3423],'final_waves':[1190.42,1194.5,1193.28,1197.39],'line_num':[2,2], 'v_obs':v_obs,'lam_ref':lam_ref, 'APERTURE':APERTURE,'OCCULTATION':OCCULTATION}
 
     #Line_Profile --> output spectrum or line profile
-    spectrum  = Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters)
+    spectrum  = Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters,profile_type)
 
     # plot spectrum in terms of observed velocities
     from matplotlib import pyplot as plt
@@ -141,11 +144,12 @@ The following is a list of different line profiles predicted with SALT.
     alpha,psi,gamma, tau, v_0, v_w, v_ap, f_c, k, delta = np.pi/4.0,np.pi/4.0,1.0,1.0,25.0,500.0,500.0,1.0,0.0,3.0
     OCCULTATION = True
     APERTURE = True
+    profile_type = 'pcygni'
 
     flow_parameters = {'alpha':alpha, 'psi':psi, 'gamma':gamma, 'tau':tau, 'v_0':v_0, 'v_w':v_w, 'v_ap':v_ap, 'f_c':f_c, 'k':k, 'delta':delta}
     profile_parameters = {'abs_waves':[1260.42],'abs_osc_strs':[1.22], 'em_waves':[1260.42,1260.42],'em_osc_strs':[1.22,1.22],'res':[True,False],'fluor':[False,True],'p_r':[0.45811051693404636,0.45811051693404636],'p_f':[0.5418894830659536,0.5418894830659536],'final_waves':[1260.42,1265.02],'line_num':[2], 'v_obs':v_obs,'lam_ref':lam_ref, 'APERTURE':APERTURE,'OCCULTATION':OCCULTATION}
 
-    spectrum = Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters)
+    spectrum = Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters,profile_type)
 
     fig, ax = plt.subplots(1,1, figsize=(7, 5))
     ax.plot(v_obs,spectrum,'r',linewidth = 2.0)
@@ -161,7 +165,7 @@ The following is a list of different line profiles predicted with SALT.
     
 .. code-block:: python
 
-    # SiIII 1206 singlet (dusty sphere)
+    # SiIII 1206 singlet (pure emission profile for a dusty sphere)
 
     lam_ref = 1206.5
     v_obs = np.linspace(-1000,1000,1000)
@@ -169,11 +173,12 @@ The following is a list of different line profiles predicted with SALT.
     alpha,psi,gamma, tau, v_0, v_w, v_ap, f_c, k, delta = np.pi/2.0,0,1.0,1.0,25.0,500.0,500.0,1.0,10.0,3.0
     OCCULTATION = True
     APERTURE = True
+    profile_type = 'emission'
 
     flow_parameters = {'alpha':alpha, 'psi':psi, 'gamma':gamma, 'tau':tau, 'v_0':v_0, 'v_w':v_w, 'v_ap':v_ap, 'f_c':f_c, 'k':k, 'delta':delta}
     profile_parameters = {'abs_waves':[1206.5],'abs_osc_strs':[1.67], 'em_waves':[1206.5],'em_osc_strs':[1.67],'res':[True],'fluor':[False],'p_r':[1.0],'p_f':[0.0],'final_waves':[1206.5],'line_num':[1], 'v_obs':v_obs,'lam_ref':lam_ref, 'APERTURE':APERTURE,'OCCULTATION':OCCULTATION}
 
-    spectrum = Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters)
+    spectrum = Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters,profile_type)
 
     fig, ax = plt.subplots(1,1, figsize=(7, 5))
     ax.plot(v_obs,spectrum,'r',linewidth = 2.0)
@@ -197,11 +202,12 @@ The following is a list of different line profiles predicted with SALT.
     alpha,psi,gamma, tau, v_0, v_w, v_ap, f_c, k, delta = np.pi/4.0,np.pi/2.0,1.0,1.0,25.0,500.0,500.0,1.0,0.0,3.0
     OCCULTATION = True
     APERTURE = True
+    profile_type = 'pcygni'
 
     flow_parameters = {'alpha':alpha, 'psi':psi, 'gamma':gamma, 'tau':tau, 'v_0':v_0, 'v_w':v_w, 'v_ap':v_ap, 'f_c':f_c, 'k':k, 'delta':delta}
     profile_parameters = {'abs_waves':[1393.76,1402.77],'abs_osc_strs':[.513,.255], 'em_waves':[1393.76,1402.77],'em_osc_strs':[.513,.255],'res':[True,True],'fluor':[False,False],'p_r':[1.0,1.0],'p_f':[0.0,0.0],'final_waves':[1393.76,1402.77],'line_num':[1,1], 'v_obs':v_obs,'lam_ref':lam_ref, 'APERTURE':APERTURE,'OCCULTATION':OCCULTATION}
 
-    spectrum  = Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters)
+    spectrum  = Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters,profile_type)
 
     fig, ax = plt.subplots(1,1, figsize=(7, 5))
     ax.plot(v_obs,spectrum,'r',linewidth = 2.0)
@@ -231,11 +237,12 @@ The following is a list of different line profiles predicted with SALT.
     alpha,psi,gamma, tau, v_0, v_w, v_ap, f_c, k, delta = np.pi/2.0,0,1.0,1.0,25.0,500.0,50.0,1.0,0.0,3.0
     OCCULTATION = True
     APERTURE = True
+    profile_type = 'pcygni'
 
     flow_parameters = {'alpha':alpha, 'psi':psi, 'gamma':gamma, 'tau':tau, 'v_0':v_0, 'v_w':v_w, 'v_ap':v_ap, 'f_c':f_c, 'k':k, 'delta':delta}
     profile_parameters = {'abs_waves':[1548.202,1550.772],'abs_osc_strs':[0.19,0.0952], 'em_waves':[1548.202,1550.772],'em_osc_strs':[0.19,0.0952],'res':[True,True],'fluor':[False,False],'p_r':[1.0,1.0],'p_f':[0.0,0.0],'final_waves':[1548.202,1550.772],'line_num':[1,1], 'v_obs':v_obs,'lam_ref':lam_ref, 'APERTURE':APERTURE,'OCCULTATION':OCCULTATION}
 
-    spectrum = Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters)
+    spectrum = Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters,profile_type)
 
     fig, ax = plt.subplots(1,1, figsize=(7, 5))
     ax.plot(v_obs,spectrum,'r',linewidth = 2.0)
@@ -264,11 +271,12 @@ The following is a list of different line profiles predicted with SALT.
     alpha,psi,gamma, tau, v_0, v_w, v_ap, f_c, k, delta = np.pi/4.0,0,1.0,1.0,25.0,500.0,500.0,1.0,0.0,3.0
     OCCULTATION = True
     APERTURE = True
+    profile_type = 'pcygni'
 
     flow_parameters = {'alpha':alpha, 'psi':psi, 'gamma':gamma, 'tau':tau, 'v_0':v_0, 'v_w':v_w, 'v_ap':v_ap, 'f_c':f_c, 'k':k, 'delta':delta}
     profile_parameters = {'abs_waves':[2796.35,2803.53],'abs_osc_strs':[0.608,0.303], 'em_waves':[2796.35,2803.53],'em_osc_strs':[0.608,0.303],'res':[True,True],'fluor':[False,False],'p_r':[1.0,1.0],'p_f':[0.0,0.0],'final_waves':[2796.35,2803.53],'line_num':[1,1], 'v_obs':v_obs,'lam_ref':lam_ref, 'APERTURE':APERTURE,'OCCULTATION':OCCULTATION}
 
-    spectrum = Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters)
+    spectrum = Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters,profile_type)
 
     fig, ax = plt.subplots(1,1, figsize=(7, 5))
     ax.plot(v_obs,spectrum,'r',linewidth = 2.0)
@@ -284,7 +292,7 @@ The following is a list of different line profiles predicted with SALT.
     
 .. code-block:: python
 
-    # Fe II 343.49,2364.83,2380.76 (sphere with Gaussian ISM absorption)
+    # Fe II 2344.21, 2365.55, 2365.97, 2381.49 (sphere with Gaussian ISM absorption)
 
     lam_ref = 2343.49
     v_obs = np.linspace(-1000,6000,2000)
@@ -295,11 +303,12 @@ The following is a list of different line profiles predicted with SALT.
     alpha,psi,gamma, tau, v_0, v_w, v_ap, f_c, k, delta = np.pi/2.0,0,1.0,1.0,25.0,500.0,500.0,1.0,0.0,3.0
     OCCULTATION = True
     APERTURE = True
+    profile_type = 'pcygni'
 
     flow_parameters = {'alpha':alpha, 'psi':psi, 'gamma':gamma, 'tau':tau, 'v_0':v_0, 'v_w':v_w, 'v_ap':v_ap, 'f_c':f_c, 'k':k, 'delta':delta}
-    profile_parameters = {'abs_waves':[2343.49],'abs_osc_strs':[.114,.0495,.0351], 'em_waves':[2343.49,2364.83,2380.76],'em_osc_strs':[.114,.0495,.0351],'res':[True,False,False],'fluor':[False,True,True],'p_r':[0.657794676807,0.657794676807,0.657794676807],'p_f':[0.22433460076+0.117870722433,0.22433460076,0.117870722433],'final_waves':[2343.49,2364.83,2380.76],'line_num':[3], 'v_obs':v_obs,'lam_ref':lam_ref, 'APERTURE':APERTURE,'OCCULTATION':OCCULTATION}
+    profile_parameters = {'abs_waves':[2344.21],'abs_osc_strs':[.114], 'em_waves':[2343.49, 2343.49, 2343.49],'em_osc_strs':[.114, .114, .114],'res':[True,False,False],'fluor':[False,True,True],'p_r':[0.657794676807,0.657794676807,0.657794676807],'p_f':[0.22433460076+0.117870722433,0.22433460076,0.117870722433],'final_waves':[2344.21, 2365.55, 2365.97, 2381.49],'line_num':[3], 'v_obs':v_obs,'lam_ref':lam_ref, 'APERTURE':APERTURE,'OCCULTATION':OCCULTATION}
 
-    spectrum = Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters)
+    spectrum = Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters,profile_type)
 
     fig, ax = plt.subplots(1,1, figsize=(7, 5))
     ax.plot(v_obs,spectrum,'r',linewidth = 2.0)
