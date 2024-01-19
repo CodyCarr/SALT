@@ -294,7 +294,7 @@ The following is a list of different line profiles predicted with SALT.
 
     # Fe II 2344.21, 2365.55, 2365.97, 2381.49 (sphere with Gaussian ISM absorption)
 
-    lam_ref = 2343.49
+    lam_ref = 2344.21
     v_obs = np.linspace(-1000,6000,2000)
 
     a,b,c = 1.0,0,75
@@ -306,7 +306,7 @@ The following is a list of different line profiles predicted with SALT.
     profile_type = 'pcygni'
 
     flow_parameters = {'alpha':alpha, 'psi':psi, 'gamma':gamma, 'tau':tau, 'v_0':v_0, 'v_w':v_w, 'v_ap':v_ap, 'f_c':f_c, 'k':k, 'delta':delta}
-    profile_parameters = {'abs_waves':[2344.21],'abs_osc_strs':[.114], 'em_waves':[2343.49, 2343.49, 2343.49],'em_osc_strs':[.114, .114, .114],'res':[True,False,False],'fluor':[False,True,True],'p_r':[0.657794676807,0.657794676807,0.657794676807],'p_f':[0.22433460076+0.117870722433,0.22433460076,0.117870722433],'final_waves':[2344.21, 2365.55, 2365.97, 2381.49],'line_num':[3], 'v_obs':v_obs,'lam_ref':lam_ref, 'APERTURE':APERTURE,'OCCULTATION':OCCULTATION}
+    profile_parameters = {'abs_waves':[2344.21],'abs_osc_strs':[.114], 'em_waves':[2344.21, 2344.21, 2344.21],'em_osc_strs':[.114, .114, .114],'res':[True,False,False],'fluor':[False,True,True],'p_r':[0.657794676807,0.657794676807,0.657794676807],'p_f':[0.22433460076+0.117870722433,0.22433460076,0.117870722433],'final_waves':[2344.21, 2365.55, 2365.97, 2381.49],'line_num':[3], 'v_obs':v_obs,'lam_ref':lam_ref, 'APERTURE':APERTURE,'OCCULTATION':OCCULTATION}
 
     spectrum = Line_Profile(v_obs,lam_ref,background,flow_parameters,profile_parameters,profile_type)
 
