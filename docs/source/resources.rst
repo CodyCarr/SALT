@@ -8,7 +8,7 @@ Citing SALT
 
 Please cite the following paper when using the version of the SALT code used in this tutorial. 
 
- * Carr, C., Michel-Dansac, L., Blaizot, J., Scarlata, C., Henry, A., Verhamme, A., 2022, 'Testing SALT Approximation with Numerical Radiation Transfer Code Part 1: Validity and Applicability' (`arXiv:2209.14473 <https://arxiv.org/abs/2209.14473>`_)
+ * Carr, C., Michel-Dansac, L., Blaizot, J., Scarlata, C., Henry, A., Verhamme, A., 2022, `ApJ, 952, 88 <https://iopscience.iop.org/article/10.3847/1538-4357/acd331>`_ 'Testing SALT Approximation with Numerical Radiation Transfer Code Part 1: Validity and Applicability' 
 
 Science Papers
 **************
