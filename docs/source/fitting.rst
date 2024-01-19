@@ -174,9 +174,10 @@ Here we analyize the results of the model fitting.
     background = np.ones_like(v_range)
     OCCULTATION = True
     APERTURE = True
+    profile_type = 'pcygni'
     flow_parameters = {'alpha':alpha, 'psi':psi, 'gamma':gamma, 'tau':tau, 'v_0':v_0, 'v_w':v_w, 'v_ap':v_ap, 'f_c':f_c, 'k':k, 'delta':delta}
     profile_parameters = {'abs_waves':[1190.42,1193.28],'abs_osc_strs':[0.277,.575], 'em_waves':[1190.42,1190.42,1193.28,1193.28],'em_osc_strs':[0.277,0.277,0.575,0.575],'res':[True,False,True,False],'fluor':[False,True,False,True],'p_r':[.1592,.1592,.6577,.6577],'p_f':[.8408,.8408,.3423,.3423],'final_waves':[1190.42,1194.5,1193.28,1197.39],'line_num':[2,2], 'v_obs':v_range,'lam_ref':lam_ref, 'APERTURE':APERTURE,'OCCULTATION':OCCULTATION}
-    spectrum  = Line_Profile(v_range,lam_ref,background,flow_parameters,profile_parameters)
+    spectrum  = Line_Profile(v_range,lam_ref,background,flow_parameters,profile_parameters,profile_type)
 
     # smooth and rebin data
     res = 30.0/(v_range[1]-v_range[0])
