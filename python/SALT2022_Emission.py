@@ -1,6 +1,6 @@
 import math as m
 import numpy as np
-from scipy.integrate import romb,cumtrapz
+from scipy.integrate import romb, cumulative_trapezoid
 from scipy.optimize import root,brentq
 from scipy.special import hyp2f1
 from cmath import atan
@@ -24,9 +24,9 @@ def get_Lshell(y,Gamma2,Gamma3,Gamma9,Gamma10,Gamma11,Normalized_Flux,x_spectrum
     xmax = x_spectrum[-1]
     
     CDF_x_sq = (x_spectrum)**2.0*(Normalized_Flux)
-    CDF_x_sq = cumtrapz(CDF_x_sq,x_spectrum)
+    CDF_x_sq = cumulative_trapezoid(CDF_x_sq,x_spectrum)
     CDF_x_sq = np.concatenate([[0], CDF_x_sq])
-    CDF_x = cumtrapz(Normalized_Flux,x_spectrum)
+    CDF_x = cumulative_trapezoid(Normalized_Flux,x_spectrum)
     CDF_x = np.concatenate([[0], CDF_x])
     
     il = ((xlow-xmin)/(xmax-xmin)*(length)).astype(int)
