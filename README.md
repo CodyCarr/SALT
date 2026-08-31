@@ -77,8 +77,8 @@ python python/outflow_example.py
 python python/inflow_example.py
 ```
 
-The outflow script calculates the Si II \(\lambda\lambda1190,1193\) profile.
-The inflow script calculates Fe II \(\lambda2343\), including resonant emission
+The outflow script calculates the Si II $\lambda\lambda 1190,1193$ profile.
+The inflow script calculates Fe II $\lambda 2343$, including resonant emission
 at 2343.49 Angstrom and fluorescent emission at 2364.83 and 2380.76 Angstrom.
 A successful run prints a finite flux range close to:
 
@@ -112,7 +112,7 @@ models' shared layout and their model-specific fields.
 
 ## Parameter conventions
 
-All wavelengths are in Angstrom, velocities are in km s\(^{-1}\), and angles
+All wavelengths are in Angstrom, velocities are in km s${}^{-1}$, and angles
 are in radians.
 
 ### Shared flow parameters
@@ -131,11 +131,9 @@ are in radians.
 
 The outflow model additionally requires `v_b`, the Doppler parameter for
 thermal/microturbulent broadening. The inflow model does not accept `v_b`.
-For both models, `v_ap` belongs in `observing_parameters`, not
-`flow_parameters`.
 
 `v_b` is the Doppler parameter, not the one-dimensional Gaussian standard
-deviation: \(\sigma_v=v_b/\sqrt{2}\).
+deviation: $\sigma_v=v_b/\sqrt{2}$.
 
 ### Shared observing and model-selection parameters
 
