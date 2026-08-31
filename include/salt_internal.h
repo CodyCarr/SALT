@@ -13,7 +13,7 @@ void computeABS_vector(
     double einstein_coefficient, const double *v_obs, int n,
     double alpha, double psi, double gamma, double tau,
     double v_0, double v_w, double v_ap, double v_b,
-    double covering_fraction, double delta, int aperture,
+    double f_c, double delta, int aperture,
     double sobolev_width, int use_sobolev_wings,
     int profile_method, double *out
 );
@@ -29,7 +29,7 @@ void computeEM_vector(
     const double *shell_luminosity, int n_shells,
     double alpha, double psi, double gamma, double tau,
     double v_0, double v_w, double v_ap, double v_b,
-    double covering_fraction, double k_dust, double delta,
+    double f_c, double k_dust, double delta,
     int aperture, int resonance, int fluorescence, int blending,
     int occultation, int profile_method, double p_r, double p_f,
     double *out

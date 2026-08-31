@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <stddef.h>
+
 #if defined(_WIN32)
 #  define SALT_API __declspec(dllexport)
 #elif defined(__GNUC__) || defined(__clang__)
@@ -68,7 +70,7 @@ SALT_API void Line_Profile(
 
     double alpha, double psi, double gamma, double tau,
     double v_0, double v_w, double v_ap, double v_b,
-    double covering_fraction, double k_dust, double delta,
+    double f_c, double k_dust, double delta,
     int aperture, int occultation,
     double sobolev_width,
     int use_sobolev_wings,
@@ -76,6 +78,30 @@ SALT_API void Line_Profile(
 
     int profile_type,
     double *out_profile
+);
+
+/*
+ * Compute a continuum-normalized inflow profile.
+ *
+ * This lower-level interface is intentionally separate from Line_Profile()
+ * because the inflow and turbulent-outflow models currently use different
+ * atomic inputs.  Most users should select model_type="inflow" through the
+ * Python salt() dispatcher instead of calling this function directly.
+ */
+SALT_API void Line_Profile_Inflow(
+    const double *v_obs, size_t n_velocity,
+    double lambda_ref, const double *background,
+    const double *abs_waves, const double *abs_osc, size_t n_abs,
+    const double *em_waves, const double *emitted_waves,
+    const double *em_osc, size_t n_em,
+    const int *resonance, const int *fluorescence,
+    const double *p_r, const double *p_f,
+    const int *line_num, size_t n_line_num,
+    double alpha, double psi, double gamma, double tau,
+    double v_0, double v_w, double v_ap,
+    double f_c, double k_dust, double delta,
+    int aperture, int occultation, int profile_type,
+    double *output
 );
 
 #ifdef __cplusplus

@@ -35,7 +35,9 @@ else
   TARGET := libsalt.so
 endif
 
-SRC := src/SALT2026_LineProfile.c src/SALT2026_Emission.c src/SALT2026_Absorption.c
+SRC := src/SALT2026_LineProfile.c src/SALT2026_Emission.c src/SALT2026_Absorption.c \
+       src/SALT_Inflow_LineProfile.c src/SALT_Inflow_Emission.c \
+       src/SALT_Inflow_Absorption.c
 OBJ := $(SRC:.c=.o)
 
 all: $(TARGET)

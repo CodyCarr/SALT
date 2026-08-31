@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: BSD-3-Clause */
 
 /*
- * Continuum absorption by an accelerating spherical or biconical SALT wind.
+ * Continuum absorption by an accelerating biconical outflow.
  *
  * For v_b > 0 the optical depth is integrated through the finite resonance
  * volume using a Voigt cross section.  For v_b == 0 the code evaluates the
@@ -85,6 +85,8 @@ static inline double colt_approx(double x, double a)
         (z - 1.5 - 1.5/(z - 3.5 - 5.0/(z - 5.5)));
 }
 
+/* Return Re[w(x+ia)], using either libcerf's Faddeeva function or the faster
+   COLT continued-fraction approximation selected by the caller. */
 static inline double voigt_real(double x, double a, int profile_method)
 {
     if (profile_method == VOIGT_COLT)
@@ -97,6 +99,8 @@ static inline double voigt_real(double x, double a, int profile_method)
 __attribute__((constructor))
 static void disable_gsl_abort(void)
 {
+    /* Numerical failures are handled locally rather than terminating the host
+       Python process.  Azimuthal trigonometric values are also cached once. */
     gsl_set_error_handler_off();
     const double dphi = 2.0 * M_PI / (double)Nphi;
     for (int k = 0; k < Nphi; k++) {
@@ -123,6 +127,8 @@ static double y1_root_f(double y, void *params)
     return y*y*(1.0 - pow(y, P->G9)) - P->absx*P->absx;
 }
 
+/* Solve an aperture or source-boundary equation on a verified bracket.  The
+   return value indicates success; the root is written only on success. */
 static int brent_root(
     double (*f)(double, void*),
     void *params,
@@ -175,6 +181,7 @@ static inline double positive_floor(double v, double eps)
     return (v < eps) ? eps : v;
 }
 
+/* Composite Simpson integration for uniformly sampled optical-depth rays. */
 static double simpson_samples(const double *f, int n, double dx)
 {
     if (n < 3 || (n % 2) == 0) return 0.0;
@@ -187,6 +194,8 @@ static double simpson_samples(const double *f, int n, double dx)
 }
 
 /* ---------------- Resonant integrand ---------------- */
+/* Local turbulent optical-depth density n(s) sigma[nu(s)].  This variant
+   computes the geometric quantities directly for one ray sample. */
 static inline double Resonant_OD_Integrand_fast(
     double s,
     double y,
@@ -225,6 +234,8 @@ static inline double Resonant_OD_Integrand_fast(
     return pow(base, G11) * w;
 }
 
+/* Same optical-depth integrand using density and projected velocity cached in
+   TurbulentGrid for reuse across observed-velocity bins. */
 static inline double Resonant_OD_Integrand_cached(
     double density,
     double xs,
@@ -245,6 +256,8 @@ static inline double Resonant_OD_Integrand_cached(
     return density * voigt_real(a, a1, profile_method);
 }
 
+/* Precompute line-of-sight limits, sample spacing, density, and projected bulk
+   velocity for every impact parameter and ray sample. */
 static void build_turbulent_grid(
     TurbulentGrid *grid,
     double lower,
@@ -288,6 +301,8 @@ static void build_turbulent_grid(
 }
 
 /* ================== Orientation I (alpha >= pi/2) ================== */
+/* Orientation I: observer lies inside the bicone (psi <= alpha).  Determine
+   the intervals in azimuth and line-of-sight distance occupied by the wind. */
 static void Orientation_I(
     const double *h,
     const double *hG2,
@@ -386,6 +401,7 @@ static void Orientation_I(
 }
 
 /* ================== Orientation II (psi > alpha) ================== */
+/* Orientation II: observer lies outside the bicone (psi > alpha). */
 static void Orientation_II(
     const double *h,
     const double *hG2,
@@ -526,6 +542,8 @@ static void Orientation_II(
 }
 
 /* ==================== Orientation III (psi < alpha) ====================== */
+/* Spherical limiting geometry.  Kept separate to avoid bicone intersection
+   algebra in the most common validation case. */
 static void Orientation_III(
     const double *h,
     const double *hG2,
@@ -677,6 +695,8 @@ static void Orientation_III(
 /* ============================================================
    Vectorized turbulent orientation dispatch (ONE call per geometry)
    ============================================================ */
+/* Integrate transmission around one projected annulus and return the
+   azimuthally averaged absorbed fraction. */
 static inline void compute_phi_turbulent(
     const double *y,
     const double *yG2,
@@ -734,6 +754,8 @@ static inline void compute_phi_turbulent(
     }
 }
 
+/* Full finite-width turbulent/thermal absorption evaluated from the cached
+   three-dimensional ray grid. */
 static void get_turb_Absorption_Profile(
     const double *h,
     int n,
@@ -750,7 +772,7 @@ static void get_turb_Absorption_Profile(
     double hG5[Ny];
     double phi[Ny];
 
-    const double f_holes = SALT[5];
+    const double f_c = SALT[5];
     const double con = SALT[8] * LINE[1];
 
     for (int i = 0; i < n; i++) {
@@ -767,15 +789,16 @@ static void get_turb_Absorption_Profile(
     );
 
     for (int i = 0; i < n; i++)
-        s1_out[i] = f_holes * h[i] * phi[i] / M_PI;
+        s1_out[i] = f_c * h[i] * phi[i] / M_PI;
 }
 
-/* ============================================================
-   IMPORTANT: Fix signatures of GI/GII/GIII/GIV
-   All yG* must be POINTERS (const double*)
-   ============================================================ */
+/* In the analytic bicone routines below, f_g is the geometric fraction of an
+   isovelocity ring contained within the flow.  It is distinct from the global
+   gas covering fraction f_c; the absorption contribution contains f_c*f_g. */
 
 /* ===================== GIV ===================== */
+/* The GIV--GI routines implement the four analytic Sobolev bicone cases.
+   They are used outside sobolev_width only when hybrid wings are enabled. */
 static void get_Absorption_Profile_GIV(
     const double *y,
     const double *yG1, const double *yG2, const double *yG3,
@@ -808,7 +831,7 @@ static void get_Absorption_Profile_GIV(
     const double R = GEOMETRY[17];
 
     const double tau_0   = SALT[3];
-    const double f_holes = SALT[5];
+    const double f_c = SALT[5];
 
     for (int i = 0; i < n; i++) {
         const double yi = y[i];
@@ -835,10 +858,10 @@ static void get_Absorption_Profile_GIV(
 
             const double u = sqrt(u2);
             const double d = yG3[i] * O - p * G;
-            const double f_c = Gamma6 * atan2(u, d);
+            const double f_g = Gamma6 * atan2(u, d);
 
             s1_out[i] =
-                f_holes * f_c * Gamma2 *
+                f_c * f_g * Gamma2 *
                 (yG8[i] + Gamma7 * absx*absx * yG9[i]) *
                 (1.0 - exp(-tau_y));
         }
@@ -878,7 +901,7 @@ static void get_Absorption_Profile_GIII(
     const double N = GEOMETRY[13];
 
     const double tau_0   = SALT[3];
-    const double f_holes = SALT[5];
+    const double f_c = SALT[5];
 
     for (int i = 0; i < n; i++) {
         const double yi = y[i];
@@ -900,10 +923,10 @@ static void get_Absorption_Profile_GIII(
             double p2 = t*t - (t - k)*(t - k);
             if (p2 < 0.0) p2 = 0.0;
 
-            const double f_c = Gamma6 * atan2(sqrt(p2), DD);
+            const double f_g = Gamma6 * atan2(sqrt(p2), DD);
 
             s1_out[i] =
-                f_holes * f_c * Gamma2 *
+                f_c * f_g * Gamma2 *
                 (yG8[i] + Gamma7 * absx*absx * yG9[i]) *
                 (1.0 - exp(-tau_y));
         }
@@ -917,7 +940,7 @@ static void get_Absorption_Profile_GIII(
             double p2 = t*t - (t - k)*(t - k);
             if (p2 < 0.0) p2 = 0.0;
 
-            const double f_c_u = Gamma6 * atan2(sqrt(p2), DD);
+            const double f_g_u = Gamma6 * atan2(sqrt(p2), DD);
 
             k = (yG3[i] * D - lhs) / H;
             p2 = t*t - (t - k)*(t - k);
@@ -925,11 +948,11 @@ static void get_Absorption_Profile_GIII(
 
             DD = yG3[i] * M - yG3[i] * D / E + lhs / E;
 
-            const double f_c_l = Gamma6 * atan2(sqrt(p2), DD);
-            const double f_c = f_c_l + f_c_u;
+            const double f_g_l = Gamma6 * atan2(sqrt(p2), DD);
+            const double f_g = f_g_l + f_g_u;
 
             s1_out[i] =
-                f_holes * f_c * Gamma2 *
+                f_c * f_g * Gamma2 *
                 (yG8[i] + Gamma7 * absx*absx * yG9[i]) *
                 (1.0 - exp(-tau_y));
         }
@@ -970,7 +993,7 @@ static void get_Absorption_Profile_GII(
     const double R  = GEOMETRY[17];
 
     const double tau_0   = SALT[3];
-    const double f_holes = SALT[5];
+    const double f_c = SALT[5];
 
     for (int i = 0; i < n; i++) {
         const double yi = y[i];
@@ -986,7 +1009,7 @@ static void get_Absorption_Profile_GII(
 
         if (lhs >= yG3[i] * R) {
             s1_out[i] =
-                f_holes * Gamma2 *
+                f_c * Gamma2 *
                 (yG8[i] + Gamma7 * absx*absx * yG9[i]) *
                 (1.0 - exp(-tau_y));
         }
@@ -1004,10 +1027,10 @@ static void get_Absorption_Profile_GII(
                 if (arg >  1.0) arg =  1.0;
                 if (arg < -1.0) arg = -1.0;
 
-                const double f_c = 1.0 - acos(arg) * Gamma6;
+                const double f_g = 1.0 - acos(arg) * Gamma6;
 
                 s1_out[i] =
-                    f_holes * f_c * Gamma2 *
+                    f_c * f_g * Gamma2 *
                     (yG8[i] + Gamma7 * absx*absx * yG9[i]) *
                     (1.0 - exp(-tau_y));
             }
@@ -1025,10 +1048,10 @@ static void get_Absorption_Profile_GII(
             const double d = sqrt(d2);
             const double h = yG3[i] * O - (lhs - yG3[i] * Ig) / E;
 
-            const double f_c = Gamma6 * atan2(d, h);
+            const double f_g = Gamma6 * atan2(d, h);
 
             s1_out[i] =
-                f_holes * f_c * Gamma2 *
+                f_c * f_g * Gamma2 *
                 (yG8[i] + Gamma7 * absx*absx * yG9[i]) *
                 (1.0 - exp(-tau_y));
         }
@@ -1068,7 +1091,7 @@ static void get_Absorption_Profile_GI(
     const double Q = GEOMETRY[16];
 
     const double tau_0   = SALT[3];
-    const double f_holes = SALT[5];
+    const double f_c = SALT[5];
 
     for (int i = 0; i < n; i++) {
         const double yi = y[i];
@@ -1084,7 +1107,7 @@ static void get_Absorption_Profile_GI(
 
         if (lhs > yG3[i] * N) {
             s1_out[i] =
-                f_holes * Gamma2 *
+                f_c * Gamma2 *
                 (yG8[i] + Gamma7 * absx*absx * yG9[i]) *
                 (1.0 - exp(-tau_y));
             continue;
@@ -1101,10 +1124,10 @@ static void get_Absorption_Profile_GI(
                 if (arg >  1.0) arg =  1.0;
                 if (arg < -1.0) arg = -1.0;
 
-                const double f_c = 1.0 - acos(arg) * Gamma6;
+                const double f_g = 1.0 - acos(arg) * Gamma6;
 
                 s1_out[i] =
-                    f_holes * f_c * Gamma2 *
+                    f_c * f_g * Gamma2 *
                     (yG8[i] + Gamma7 * absx*absx * yG9[i]) *
                     (1.0 - exp(-tau_y));
             }
@@ -1119,10 +1142,10 @@ static void get_Absorption_Profile_GI(
             double p2 = t*t - (t - k)*(t - k);
             if (p2 < 0.0) p2 = 0.0;
 
-            const double f_c = Gamma6 * atan2(sqrt(p2), DD);
+            const double f_g = Gamma6 * atan2(sqrt(p2), DD);
 
             s1_out[i] =
-                f_holes * f_c * Gamma2 *
+                f_c * f_g * Gamma2 *
                 (yG8[i] + Gamma7 * absx*absx * yG9[i]) *
                 (1.0 - exp(-tau_y));
             continue;
@@ -1136,9 +1159,9 @@ static void get_Absorption_Profile_GI(
             if (p2 < 0.0) p2 = 0.0;
 
             const double DD_l = yG3[i] * M - yG3[i] * D / E + lhs / E;
-            const double f_c_l = Gamma6 * atan2(sqrt(p2), DD_l);
+            const double f_g_l = Gamma6 * atan2(sqrt(p2), DD_l);
 
-            double f_c_u = 0.0;
+            double f_g_u = 0.0;
             if (denom > 0.0) {
                 const double v = (lhs - w * C) * Q;
 
@@ -1146,13 +1169,13 @@ static void get_Absorption_Profile_GI(
                 if (arg >  1.0) arg =  1.0;
                 if (arg < -1.0) arg = -1.0;
 
-                f_c_u = 1.0 - acos(arg) * Gamma6;
+                f_g_u = 1.0 - acos(arg) * Gamma6;
             }
 
-            const double f_c = f_c_u + f_c_l;
+            const double f_g = f_g_u + f_g_l;
 
             s1_out[i] =
-                f_holes * f_c * Gamma2 *
+                f_c * f_g * Gamma2 *
                 (yG8[i] + Gamma7 * absx*absx * yG9[i]) *
                 (1.0 - exp(-tau_y));
             continue;
@@ -1166,19 +1189,19 @@ static void get_Absorption_Profile_GI(
             if (p2 < 0.0) p2 = 0.0;
 
             const double DD_l = yG3[i] * M - yG3[i] * D / E + lhs / E;
-            const double f_c_l = Gamma6 * atan2(sqrt(p2), DD_l);
+            const double f_g_l = Gamma6 * atan2(sqrt(p2), DD_l);
 
             const double k_u = (yG3[i] * D + lhs) / H;
             p2 = t*t - (t - k_u)*(t - k_u);
             if (p2 < 0.0) p2 = 0.0;
 
             const double DD_u = yG3[i] * M - yG3[i] * D / E - lhs / E;
-            const double f_c_u = Gamma6 * atan2(sqrt(p2), DD_u);
+            const double f_g_u = Gamma6 * atan2(sqrt(p2), DD_u);
 
-            const double f_c = f_c_u + f_c_l;
+            const double f_g = f_g_u + f_g_l;
 
             s1_out[i] =
-                f_holes * f_c * Gamma2 *
+                f_c * f_g * Gamma2 *
                 (yG8[i] + Gamma7 * absx*absx * yG9[i]) *
                 (1.0 - exp(-tau_y));
             continue;
@@ -1194,6 +1217,9 @@ static void get_Absorption_Profile_GI(
    and SW is ignored.
 */
 
+/* Evaluate one dimensionless observed velocity.  In hybrid mode this chooses
+   between the finite-width Voigt calculation and the analytic Sobolev wing;
+   otherwise the turbulent calculation is used everywhere. */
 static double Absorption_Integral(
     double x, double alpha, double psi, double y_inf,
     const double *SALT,
@@ -1268,8 +1294,8 @@ static double Absorption_Integral(
 
 	if (test < 0.0 &&
 	    brent_root(y1ap_root_f, &P, lower, y_inf, &rtmp)) {
-	  upper = rtmp;
-	}
+		  upper = rtmp;
+		}
 
       } else {
         scale = 1.0;
@@ -1366,6 +1392,14 @@ static double Absorption_Integral(
     return Intensity;
 }
 
+/*
+ * Compute the absorption contribution for one transition on v_obs.
+ *
+ * The returned array is additive relative to the continuum (zero outside the
+ * line and negative in absorption).  wavelength is in Angstrom, Einstein A in
+ * s^-1, and velocities in km s^-1.  Geometry and quadrature work shared by
+ * velocity bins is initialized once before the OpenMP loop.
+ */
 void computeABS_vector(
     double wavelength,
     double oscillator_strength,
@@ -1374,7 +1408,7 @@ void computeABS_vector(
     double alpha, double psi, double gamma, double tau,
     double v_0, double v_w,
     double v_ap, double v_b,
-    double f_holes, double delta,
+    double f_c, double delta,
     int APERTURE,
     double SW,
     int use_sobolev_wings,
@@ -1382,7 +1416,8 @@ void computeABS_vector(
     double *I_out
 )
 {
-    /* ---------- psi == alpha fix ---------- */
+    /* Avoid an exactly tangent cone boundary, where several analytic
+       orientation expressions become numerically degenerate. */
     if (fabs(alpha - psi) < 1e-14 && alpha < M_PI/2.0) {
     psi = fmin(psi + 1e-12, nextafter(M_PI/2.0, 0.0));
     }
@@ -1392,7 +1427,7 @@ void computeABS_vector(
     const double A_ul  = einstein_coefficient;
 
     if (n <= 0) return;
-    if (alpha == 0.0 || tau_0 == 0.0 || f_holes == 0.0 || v_0 == 0.0 || v_ap == 0.0) {
+    if (alpha == 0.0 || tau_0 == 0.0 || f_c == 0.0 || v_0 == 0.0 || v_ap == 0.0) {
         for (int i = 0; i < n; ++i) I_out[i] = 0.0;
         return;
     }
@@ -1480,7 +1515,7 @@ void computeABS_vector(
     };
 
     const double SALT[9] = {
-        alpha, psi, gamma, tau_0, y_inf, f_holes, delta, y_ap, n_0
+        alpha, psi, gamma, tau_0, y_inf, f_c, delta, y_ap, n_0
     };
 
     const double LINE[10] = {
@@ -1489,6 +1524,8 @@ void computeABS_vector(
         (profile_method == VOIGT_COLT) ? (double)VOIGT_COLT : (double)VOIGT_WOFZ
     };
 
+    /* The turbulent grid is independent of observed velocity and is therefore
+       constructed once and shared read-only by all worker threads. */
     TurbulentGrid *turb_grid = NULL;
     if (turbulent_mode && alpha != 0.0 && y_ap != 0.0) {
         const double h_upper = (APERTURE && SALT[7] < 1.0)

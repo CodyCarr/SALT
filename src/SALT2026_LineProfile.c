@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: BSD-3-Clause */
 
 /*
- * Assemble a complete SALT spectrum from the absorption and scattered-
+ * Assemble a complete outflowing SALT spectrum from the absorption and scattered-
  * emission kernels.
  *
  * The driver applies wavelength offsets for multiplets, accumulates the
@@ -45,6 +45,7 @@ enum {
    Helpers matching NumPy/SciPy behavior
    ============================================================ */
 
+/* NumPy-compatible left insertion point for an increasing velocity grid. */
 static inline int searchsorted_left(const double *a, int n, double x)
 {
     int lo = 0, hi = n;
@@ -133,6 +134,7 @@ static inline void shift_profile(
 }
 
 /* trapezoid(1 - flux, x=v_obs) */
+/* Equivalent width in velocity units: integral of 1-F over v_obs. */
 static inline double trapz_one_minus(const double *flux, const double *x, int n)
 {
     double area = 0.0;
@@ -148,6 +150,8 @@ static inline double trapz_one_minus(const double *flux, const double *x, int n)
    Convolution
    ============================================================ */
 
+/* Convolve emission with a normalized one-dimensional Maxwellian kernel of
+   standard deviation sigma=v_b/sqrt(2), preserving the input array length. */
 static void convolve_same_gaussian_dx(
     double *signal,
     const double *v_obs,
@@ -237,6 +241,7 @@ static inline double clampd(double x, double lo, double hi)
 }
 
 /* scalar translation of get_Area_single() */
+/* Projected covering area of one cone at shell coordinate y. */
 static inline double get_Area_single_scalar(double y, double alpha, double psi)
 {
     if (y <= 0.0) return 0.0;
@@ -304,6 +309,8 @@ static inline double get_Area_bicone_scalar(double y, double alpha, double psi)
     return (sum > 1.0) ? 1.0 : sum;
 }
 
+/* Minimum residual continuum allowed by the projected bicone covering
+   fraction. */
 static double covering_floor_scalar(double alpha, double psi,
                                     double v_0, double v_w)
 {
@@ -354,6 +361,8 @@ static double covering_floor_scalar(double alpha, double psi,
    - floor computed once per run
    ============================================================ */
 
+/* Apply each absorption transition in wavelength order and return the final
+   transmitted continuum on the reference-velocity grid. */
 static void absorption_run_final_flux(
     const double *v_obs, int nV,
     double lambda_ref,
@@ -366,7 +375,7 @@ static void absorption_run_final_flux(
     double gamma, double tau,
     double v0_use, double vw_use,
     double v_ap_use, double v_b,
-    double f_holes, double delta,
+    double f_c, double delta,
     int APERTURE,
     double SW,
     int use_sobolev_wings,
@@ -392,7 +401,7 @@ static void absorption_run_final_flux(
             alpha_use, psi_use, gamma, tau,
             v0_use, vw_use,
             v_ap_use, v_b,
-            f_holes, delta,
+            f_c, delta,
             APERTURE, SW, use_sobolev_wings, profile_method,
             Iabs
         );
@@ -426,6 +435,8 @@ static void absorption_run_final_flux(
    areas[0] = trapz(1 - background)
    areas[l+1] = trapz(1 - flux_after_line_l)
 */
+/* Repeat absorption over radial shell boundaries and difference successive
+   cumulative spectra to obtain the energy absorbed by each shell. */
 static void absorption_run_areas(
     const double *v_obs, int nV,
     double lambda_ref,
@@ -438,7 +449,7 @@ static void absorption_run_areas(
     double gamma, double tau,
     double v0_use, double vw_use,
     double v_ap_use, double v_b,
-    double f_holes, double delta,
+    double f_c, double delta,
     int APERTURE,
     double SW,
     int use_sobolev_wings,
@@ -471,7 +482,7 @@ static void absorption_run_areas(
             alpha_use, psi_use, gamma, tau,
             v0_use, vw_use,
             v_ap_use, v_b,
-            f_holes, delta,
+            f_c, delta,
             APERTURE, SW, use_sobolev_wings, profile_method,
             Iabs
         );
@@ -512,6 +523,7 @@ static void absorption_run_areas(
    Public API: Line_Profile
    ============================================================ */
 
+/* Public entry point; see include/salt.h for units and array contracts. */
 void Line_Profile(
     const double *v_obs, int nV,
     double lambda_ref,
@@ -549,7 +561,7 @@ void Line_Profile(
 
     double alpha, double psi, double gamma, double tau,
     double v_0, double v_w, double v_ap, double v_b,
-    double f_holes, double k_dust, double delta,
+    double f_c, double k_dust, double delta,
     int APERTURE, int OCCULTATION,
     double SW,
     int use_sobolev_wings,
@@ -564,13 +576,15 @@ void Line_Profile(
     if (nV <= 0 || nAbs < 0 || nEm < 0) return;
     if (nLineNum != nAbs) return;
 
+    /* Pure absorption does not require the substantially more expensive shell
+       luminosity and re-emission calculation. */
     if (profile_type == 0) {
         absorption_run_final_flux(
             v_obs, nV, lambda_ref, background,
             abs_waves, abs_osc, abs_ein, nAbs,
             alpha, psi, gamma, tau,
             -v_0, -v_w, -v_ap, v_b,
-            f_holes, delta, APERTURE, SW, use_sobolev_wings, profile_method,
+            f_c, delta, APERTURE, SW, use_sobolev_wings, profile_method,
             out_profile
         );
         return;
@@ -585,12 +599,16 @@ void Line_Profile(
     const double psi_shell = 0.0;
     const double y_inf = fabs(v_w / v_0);
 
+    /* Shell coordinates span the source surface y=1 to the terminal wind
+       speed.  The first node is offset from the singular inner boundary. */
     double shells[Ns];
     for (int s = 0; s < Ns; s++)
         shells[s] = 1.0 + (y_inf - 1.0) * (double)s / (double)(Ns - 1);
 
     shells[0] += y_inf / (double)Ny_offset;
 
+    /* CDF[s,l] is the cumulative equivalent width after absorption line l
+       when the wind is truncated at shell s. */
     double *CDF = malloc(Ns_z * nCol_z * sizeof(double));
     if (!CDF) {
         free(CDF);
@@ -604,13 +622,15 @@ void Line_Profile(
             abs_waves, abs_osc, abs_ein, nAbs,
             alpha_shell, psi_shell, gamma, tau,
             -v_0, -v_0 * shells[s], -v_ap, v_b,
-            f_holes, delta, APERTURE, SW, use_sobolev_wings, profile_method,
+            f_c, delta, APERTURE, SW, use_sobolev_wings, profile_method,
             areas_row,
             NULL
         );
 
     }
 
+    /* Adjacent absorption stages isolate the energy removed by each parent
+       transition at every shell. */
     double *CDF2 = malloc(Ns_z * nAbs_z * sizeof(double));
     if (!CDF2) {
         free(CDF);
@@ -634,6 +654,8 @@ void Line_Profile(
         return;
     }
 
+    /* Replicate a parent's absorbed shell luminosity for each of its resonant
+       and fluorescent decay channels. */
     double *shell_energies = malloc(nEm_z * Ns_z * sizeof(double));
     if (!shell_energies) {
         free(CDF);
@@ -669,6 +691,8 @@ void Line_Profile(
 
     const double c_kms = 2.99792458e5;
 
+    /* Compute each emitted channel in its native wavelength frame, shift it to
+       lambda_ref, and add it to the total emission spectrum. */
     for (int l = 0; l < nEm; l++) {
         const int b0 = l * MAX_BLENDS;
         const int bf0 = l * MAX_BLENDS * MAX_FLUOR;
@@ -694,7 +718,7 @@ void Line_Profile(
             Ns,
             alpha, psi, gamma, tau,
             -v_0, -v_w, -v_ap, v_b,
-            f_holes, k_dust, delta,
+            f_c, k_dust, delta,
             APERTURE,
             res ? res[l] : 0,
             fluor ? fluor[l] : 0,
@@ -722,6 +746,8 @@ void Line_Profile(
 
     }
 
+    /* Random thermal/microturbulent velocities are Maxwellian in three
+       dimensions, giving a one-dimensional Gaussian sigma=v_b/sqrt(2). */
     if ((profile_type == 1 && v_b > 0.0) ||
         (profile_type == 2 && nV > 1 && v_b > fabs(v_obs[1] - v_obs[0]))) {
         convolve_same_gaussian_dx(Emission, v_obs, nV, v_b/sqrt(2.0));
@@ -740,7 +766,7 @@ void Line_Profile(
                 abs_waves, abs_osc, abs_ein, nAbs,
                 alpha, psi, gamma, tau,
                 -v_0, -v_w, -v_ap, v_b,
-                f_holes, delta, APERTURE, SW, use_sobolev_wings, profile_method,
+                f_c, delta, APERTURE, SW, use_sobolev_wings, profile_method,
                 Abs_user
             );
 

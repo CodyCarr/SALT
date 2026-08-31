@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: BSD-3-Clause */
 
 /*
- * Resonant and fluorescent re-emission
+ * Resonant and fluorescent re-emission from outflow
  *
  * The incident luminosity is tabulated by radial shell in the line-profile
  * driver.  This module applies the bicone projection, escape probabilities,
@@ -74,6 +74,7 @@ static inline double colt_approx(double x, double a)
         (z - 1.5 - 1.5/(z - 3.5 - 5.0/(z - 5.5)));
 }
 
+/* Evaluate the real Voigt/Faddeeva profile with the requested backend. */
 static inline double voigt_real(double x, double a, int profile_method)
 {
     if (profile_method == VOIGT_COLT)
@@ -118,6 +119,10 @@ typedef struct {
     BlendLine blends[MAX_BLENDS];
 } EmissionCtx;
 
+/* EmissionCtx stores all geometry, power-law, atomic, blending, and grid
+   quantities that remain fixed while observed velocity is varied. */
+
+/* In-place Thomas solve used to construct the incident-spectrum spline. */
 static int solve_tridiagonal(int n, double *a, double *b, double *c, double *d)
 {
     for (int i = 1; i < n; i++) {
@@ -131,6 +136,7 @@ static int solve_tridiagonal(int n, double *a, double *b, double *c, double *d)
     return 1;
 }
 
+/* Build second derivatives for a not-a-knot cubic spline. */
 static int spline_build_notaknot(const double *x, const double *y, int n, double *m)
 {
     if (n < 3) return 0;
@@ -173,6 +179,7 @@ static int spline_build_notaknot(const double *x, const double *y, int n, double
     return 1;
 }
 
+/* Evaluate the not-a-knot spline, using constant endpoint extrapolation. */
 static double spline_eval_notaknot(const double *x, const double *y, const double *m, int n, double xq)
 {
     int lo = 0, hi = n - 1;
@@ -322,6 +329,8 @@ static inline double pow_salt(double x, double exponent)
    subsequent resonant absorption in blended transitions.
    ------------------------------------------------------------ */
 
+/* Optical depth encountered by a photon emitted at shell y as it travels to
+   the wind boundary.  Used to attenuate overlapping resonant transitions. */
 static void tau_escape(
     const double *y_arr, const double *active_weight, int n,
     double x, double con, double a1, double nu_blend,
@@ -383,6 +392,8 @@ static void tau_escape(
     }
 }
 
+/* Analytic dust optical depth from the emitting point to the observer-facing
+   wind boundary. */
 static inline double dust(
     double y, double x, double y_inf, double k_dust, double delta,
     double G3, double G5, double G12, double G13, double G14, double G15, double G16
@@ -452,6 +463,7 @@ static inline double getBernoulli3(double y, double tau, double G4, double G9)
     return creal(0.5 * (2.0 - t1 - t2));
 }
 
+/* Select the Bernoulli or optically thick escape-probability approximation. */
 static inline double getBeta(double y, double tau, double G4, double G9, double G17, double CHANGE)
 {
     if (CHANGE == 0.0)
@@ -472,6 +484,7 @@ static inline double safe_acos(double x)
     return acos(clampd(x, -1.0, 1.0));
 }
 
+/* Geometry I: alpha + psi > pi/2 and psi <= alpha. */
 static inline double get_GI_scalar(double y, double x, const GeomConst *g, double G1, double G2, double G3, double G7, double G8)
 {
     const double lhs = x * pow(y, G1);
@@ -514,6 +527,7 @@ static inline double get_GI_scalar(double y, double x, const GeomConst *g, doubl
     }
 }
 
+/* Geometry II: alpha + psi <= pi/2 and psi <= alpha. */
 static inline double get_GII_scalar(double y, double x, const GeomConst *g, double G1, double G2, double G3, double G7, double G8)
 {
     const double lhs = x * pow(y, G1);
@@ -539,6 +553,7 @@ static inline double get_GII_scalar(double y, double x, const GeomConst *g, doub
     return 0.0;
 }
 
+/* Geometry III: alpha + psi > pi/2 and psi > alpha. */
 static inline double get_GIII_scalar(double y, double x, const GeomConst *g, double G1, double G3, double G8)
 {
     const double lhs = x * pow(y, G1);
@@ -563,6 +578,7 @@ static inline double get_GIII_scalar(double y, double x, const GeomConst *g, dou
     return 0.0;
 }
 
+/* Geometry IV: alpha + psi <= pi/2 and psi > alpha. */
 static inline double get_GIV_scalar(double y, double x, const GeomConst *g, double G1, double G3, double G8)
 {
     const double lhs = x * pow(y, G1);
@@ -578,6 +594,7 @@ static inline double get_GIV_scalar(double y, double x, const GeomConst *g, doub
     return 0.0;
 }
 
+/* Dispatch the four analytic bicone projections; GEOM_CASE==0 is spherical. */
 static inline double geometry_scalar(int GEOM_CASE, double y, double x, const GeomConst *g, double G1, double G2, double G3, double G7, double G8)
 {
     switch (GEOM_CASE) {
@@ -588,28 +605,46 @@ static inline double geometry_scalar(int GEOM_CASE, double y, double x, const Ge
     }
 }
 
-static void build_shell_grid(double lower, double upper, const EmissionCtx *C, const double *flux, const double *xk, const double *mk, int nFlux, double *y, double *shell_E)
+/* Evaluate the cumulative absorbed luminosity with its physical inner
+   boundary F(y=1)=0.  The short linear segment prevents constant spline
+   extrapolation from introducing a jump when the emission lower bound crosses
+   the launch radius. */
+static inline double shell_cdf_eval(
+    const double *xk,
+    const double *flux,
+    const double *mk,
+    int nFlux,
+    double y
+)
 {
-    const double dy = (upper - lower) / (Ny - 1);
+    if (y <= 1.0) return 0.0;
+    if (y < xk[0]) return flux[0] * (y - 1.0) / (xk[0] - 1.0);
+    return spline_eval_notaknot(xk, flux, mk, nFlux, y);
+}
 
-    for (int j = 0; j < Ny; j++)
-        y[j] = lower + dy * j;
+/* Difference the cumulative absorbed luminosity over bins contained entirely
+   within [lower, upper].  Sampling the right edge of each bin avoids the
+   singular launch boundary and keeps the result continuous as lower crosses
+   y=1 (equivalently, |v_obs|=v_0). */
+static void build_shell_grid(
+    double lower,
+    double upper,
+    const double *flux,
+    const double *xk,
+    const double *mk,
+    int nFlux,
+    double *y,
+    double *shell_E
+)
+{
+    const double dy = (upper - lower) / (double)Ny;
+    double previous = shell_cdf_eval(xk, flux, mk, nFlux, lower);
 
-    if (lower <= 1.0) {
-        y[0] += C->y_inf / (double)Ny;
-        double prev = 0.0;
-        for (int j = 0; j < Ny; j++) {
-            const double fj = spline_eval_notaknot(xk, flux, mk, nFlux, y[j]);
-            shell_E[j] = fj - prev;
-            prev = fj;
-        }
-    } else {
-        double prev = spline_eval_notaknot(xk, flux, mk, nFlux, y[0] - dy);
-        for (int j = 0; j < Ny; j++) {
-            const double fj = spline_eval_notaknot(xk, flux, mk, nFlux, y[j]);
-            shell_E[j] = fj - prev;
-            prev = fj;
-        }
+    for (int j = 0; j < Ny; j++) {
+        y[j] = lower + dy * (double)(j + 1);
+        const double current = shell_cdf_eval(xk, flux, mk, nFlux, y[j]);
+        shell_E[j] = current - previous;
+        previous = current;
     }
 }
 
@@ -619,6 +654,8 @@ static void build_shell_grid(double lower, double upper, const EmissionCtx *C, c
    conservation along the escape path.
 */
 
+/* Attenuate shell emission by neighboring transitions and distribute absorbed
+   energy among their resonant and fluorescent decay channels. */
 static void apply_blending(
     double x,
     const double *y,
@@ -715,6 +752,8 @@ static void apply_blending(
    before escaping.
    ------------------------------------------------------------ */
 
+/* Integrate shell contributions at one observed velocity, applying geometry,
+   aperture, occultation, escape probability, dust, and optional blending. */
 static void Emission_Integral(
     double x, int red, int output_index,
     double p_f, double p_r, const double *blended_p_r,
@@ -755,7 +794,7 @@ static void Emission_Integral(
 
     double y[Ny], shell_E[Ny], weight[Ny], tau_e[Ny];
 
-    build_shell_grid(lower, upper, C, flux, xk, mk, nFlux, y, shell_E);
+    build_shell_grid(lower, upper, flux, xk, mk, nFlux, y, shell_E);
 
     int any_weight = 0;
     for (int j = 0; j < Ny; j++) {
@@ -808,6 +847,7 @@ static void Emission_Integral(
 
 }
 
+/* Per-velocity worker kept separate for OpenMP and serial execution paths. */
 static void emission_worker_x(
     double x, int output_index,
     double p_f, double p_r, const double *blended_p_r,
@@ -823,6 +863,13 @@ static void emission_worker_x(
                       nFlux, x_spectrum, nSpec, CHANGE, E_out);
 }
 
+/*
+ * Compute one emitted channel over v_obs.
+ *
+ * shell_luminosity is produced by the line-profile driver from the absorbed
+ * continuum.  The output is an additive, continuum-normalized emission
+ * profile before the final Maxwellian redistribution performed by the driver.
+ */
 void computeEM_vector(
     double wavelength, double emitted_wave,
     const double *blended_waves, const double *blended_osc_strs,
@@ -833,7 +880,7 @@ void computeEM_vector(
     const double *v_obs, int n, const double *Normalized_Flux, int nFlux,
     double alpha, double psi, double gamma, double tau,
     double v_0, double v_w, double v_ap, double v_b,
-    double f_holes, double k_dust, double delta,
+    double f_c, double k_dust, double delta,
     int APERTURE, int RESONANCE, int FLUORESCENCE, int BLENDING, int OCCULTATION,
     int profile_method, double p_r, double p_f, double *E_out
 )
@@ -843,7 +890,7 @@ void computeEM_vector(
 
     for (int i = 0; i < n; i++) E_out[i] = 0.0;
     if (n <= 0 || nFlux < 3 || v_0 == 0.0 || v_ap == 0.0 || delta == 0.0) return;
-    if (alpha == 0.0 || tau == 0.0 || oscillator_strength == 0.0 || f_holes == 0.0) return;
+    if (alpha == 0.0 || tau == 0.0 || oscillator_strength == 0.0 || f_c == 0.0) return;
     if ((RESONANCE && p_r == 0.0) || (!RESONANCE && FLUORESCENCE && p_f == 0.0)) return;
 
     const double c = 2.99792458e10;
@@ -908,6 +955,8 @@ void computeEM_vector(
     C.geom.Q = tan(M_PI/2.0 - alpha + fabs(psi - alpha));
     C.geom.R = cos(psi - alpha);
 
+    /* Select the analytic projection from the opening angle alpha and the
+       orientation angle psi.  Boundary equalities follow the cases below. */
     if (alpha + psi > M_PI/2.0 && psi - alpha <= 0.0) C.GEOM_CASE = 1;
     else if (alpha + psi <= M_PI/2.0 && psi - alpha <= 0.0) C.GEOM_CASE = 2;
     else if (alpha + psi > M_PI/2.0 && psi - alpha > 0.0) C.GEOM_CASE = 3;
@@ -939,6 +988,8 @@ void computeEM_vector(
         }
     }
 
+    /* Locate the shell where the intermediate- and high-optical-depth escape
+       probability approximations should switch. */
     double CHANGE = 0.0;
 
     for (int i = 1; i < Nb - 1; i++) {
@@ -955,6 +1006,8 @@ void computeEM_vector(
         }
     }
 
+    /* Interpolate the absorbed shell luminosity smoothly because the outer
+       emission quadrature samples between the driver's discrete shells. */
     double *xk = malloc((size_t)nFlux * sizeof(double));
     double *flux = malloc((size_t)nFlux * sizeof(double));
     double *mk = malloc((size_t)nFlux * sizeof(double));
@@ -1002,6 +1055,9 @@ void computeEM_vector(
     nthreads = omp_get_max_threads();
     #endif
 
+    /* Blended fluorescent channels may deposit power in velocity bins other
+       than the worker's input bin.  Thread-private spectra avoid atomics and
+       are reduced after both red- and blue-side passes. */
     double *thread_out = calloc((size_t)nthreads * (size_t)n, sizeof(double));
 
     if (thread_out) {
