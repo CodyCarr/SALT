@@ -14,6 +14,15 @@ profile with its resonant and fluorescent channels.
    :language: python
    :linenos:
 
+.. figure:: _static/images/outflow_example.png
+   :width: 85%
+   :align: center
+   :alt: Output of the Si II turbulent-outflow example
+
+   Output of the turbulent-outflow example. Solid blue lines mark the
+   resonant Si II transitions, while dashed blue lines mark the fluorescent
+   Si II* transitions.
+
 Fe II inflow example
 --------------------
 
@@ -23,3 +32,12 @@ This example calculates Fe II :math:`\lambda2343`, with resonant emission at
 .. literalinclude:: ../../python/inflow_example.py
    :language: python
    :linenos:
+
+.. figure:: _static/images/inflow_example.png
+   :width: 85%
+   :align: center
+   :alt: Output of the Fe II inflow example
+
+   Output of the inflow example. The solid blue line marks the resonant Fe II
+   transition, while dashed blue lines mark the fluorescent Fe II*
+   transitions.
