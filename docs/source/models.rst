@@ -27,26 +27,57 @@ the line of sight and :math:`\xi` is perpendicular to it.
    radius :math:`R_{\rm AP}`. The bicone is specified by :math:`\alpha` and
    :math:`\psi`. Adapted from Carr et al. (2018).
 
+Outflows and inflows
+--------------------
+
+SALT can model either material accelerating away from the central source or
+material falling inward toward it. Select the expanding-flow calculation with
+:code:`model_type="outflow"` and the contracting-flow calculation with
+:code:`model_type="inflow"`. The two implementations use the same biconical
+geometry and density field but adopt different radial velocity fields. Inflow
+speeds are supplied to the Python interface as positive magnitudes; the C
+dispatcher applies the inward radial direction internally.
+
 Radial structure
 ----------------
 
-The bulk speed and number density are parameterized as power laws,
+The outflowing velocity field is
 
 .. math::
 
-   v(r) = v_0\left(\frac{r}{R_{\rm SF}}\right)^\gamma,
-   \qquad
+   v_{\rm out}(r) =
+   v_0\left(\frac{r}{R_{\rm SF}}\right)^\gamma.
+
+The inflowing speed magnitude is
+
+.. math::
+
+   v_{\rm in}(r) =
+   v_w-v_0\left(\frac{r}{R_{\rm SF}}\right)^\gamma,
+
+with the velocity vector directed toward the source. Both the outflow and
+inflow calculations use the same density field,
+
+.. math::
+
    n(r) = n_0\left(\frac{r}{R_{\rm SF}}\right)^{-\delta}.
 
-Here :math:`v_0` is the launch speed, :math:`\gamma` is the velocity-field
-index, :math:`n_0` is the density at the source surface, and :math:`\delta` is
-the density-field index. The supplied terminal speed :math:`v_w` fixes the
-outer radius through
+Here :math:`v_0` sets the velocity scale, :math:`v_w` is the terminal-velocity
+parameter, :math:`\gamma` is the velocity-field index, :math:`n_0` is the
+density at the source surface, and :math:`\delta` is the density-field index.
+The outer radius differs between the two velocity laws. For the outflow,
 
 .. math::
 
-   \frac{R_{\rm W}}{R_{\rm SF}} =
+   \left(\frac{R_{\rm W}}{R_{\rm SF}}\right)_{\rm out} =
    \left(\frac{v_w}{v_0}\right)^{1/\gamma}.
+
+For the inflow,
+
+.. math::
+
+   \left(\frac{R_{\rm W}}{R_{\rm SF}}\right)_{\rm in} =
+   \left(\frac{v_w}{v_0}-1\right)^{1/\gamma}.
 
 The optical-depth normalization :math:`\tau` sets the interaction strength of
 each transition after its oscillator strength and wavelength are included.
@@ -61,8 +92,10 @@ the absorption component. Absorbed photons may subsequently escape through
 the same resonant transition or through a fluorescent channel. SALT uses the
 branching probabilities :math:`p_r` and :math:`p_f` to distribute this
 re-emission. Emission from the receding flow can be blocked by the source when
-:code:`OCCULTATION=True`, and emission outside :math:`R_{\rm AP}` is excluded
-when :code:`APERTURE=True`.
+:code:`OCCULTATION=True`. The code accounts for a limiting finite observing
+aperture when :code:`APERTURE=True`. The user parameter :code:`v_ap`
+represents the velocity at the projected radius of the aperture,
+:math:`R_{\rm AP}`.
 
 In a Sobolev calculation, a photon interacts with a geometrically thin surface
 of constant projected velocity, :math:`\Omega_x`. Thermal and microturbulent

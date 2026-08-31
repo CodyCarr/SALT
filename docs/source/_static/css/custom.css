@@ -1,0 +1,11 @@
+/* Justify documentation prose without changing headings or code blocks. */
+.wy-nav-content p,
+.wy-nav-content li,
+.wy-nav-content dd,
+.wy-nav-content td,
+.wy-nav-content th,
+.wy-nav-content figcaption,
+.wy-nav-content .caption-text {
+    text-align: justify;
+    text-justify: inter-word;
+}

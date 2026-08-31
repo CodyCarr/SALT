@@ -4,7 +4,7 @@ Installation
 Dependencies
 ------------
 
-C SALT requires a C11 compiler, GSL, libcerf, OpenMP, Python 3, and NumPy.
+SALT requires a C11 compiler, GSL, libcerf, OpenMP, Python 3, and NumPy.
 Matplotlib is needed only for the plotting examples.
 
 On macOS with Homebrew:

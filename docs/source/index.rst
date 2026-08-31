@@ -25,8 +25,8 @@ profiles and fitting SALT models to data.
    :maxdepth: 2
    :caption: Getting started
 
-   installation
    models
+   installation
    examples
 
 .. toctree::
