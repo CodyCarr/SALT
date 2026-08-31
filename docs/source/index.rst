@@ -1,37 +1,25 @@
 SALT
 ====
 
-SALT is a C implementation of the Semi-Analytical Line Transfer framework
-for continuum absorption and resonant or fluorescent re-emission by spherical
-and biconical galactic flows. It provides separate turbulent-outflow and
-inflow models through one Python interface.
-
 .. image:: _static/images/logo.png
    :width: 100%
    :alt: Semi-Analytical Line Transfer model applied to a galactic outflow
    :align: center
 
-The outflow implementation includes thermal and microturbulent broadening,
-dust, finite apertures, occultation, and attenuation by overlapping
-transitions. The current inflow implementation uses the Sobolev approximation
-and does not include turbulent broadening or transition blending.
-
-Most users should call :code:`salt()` from :code:`python/run_salt.py` and set
-:code:`model_type` explicitly to :code:`"outflow"` or :code:`"inflow"`.
-
-.. code-block:: python
-
-   from run_salt import salt
-
-   spectrum = salt(
-       v_obs=v_obs,
-       lam_ref=lam_ref,
-       background=background,
-       flow_parameters=flow_parameters,
-       profile_parameters=profile_parameters,
-       profile_type="pcygni",
-       model_type="outflow",
-   )
+The Semi-Analytical Line Transfer (SALT) model is a radiative-transfer code
+for predicting the spectra of galactic outflows and inflows. SALT is a
+forward-modeling framework that connects a physical description of a galactic
+flow to predicted spectral-line profiles by solving the radiative-transfer
+equation under a specified set of boundary conditions. The model accounts for
+resonant absorption as well as resonant and fluorescent emission. When fitted
+to observations, SALT can constrain the kinematics, geometry, density
+structure, and spatial distribution of the flowing gas, along with integrated
+quantities such as ionic column densities and mass-flow rates. Tests against
+idealized models and cosmological zoom-in simulations have demonstrated SALT's
+ability to recover column densities and mass-outflow rates accurately
+(< 1 dex) within its validated regimes (Carr et al. 2021, 2025). This tutorial
+introduces the code and provides practical examples of calculating line
+profiles and fitting SALT models to data.
 
 .. toctree::
    :maxdepth: 2
@@ -55,11 +43,3 @@ Most users should call :code:`salt()` from :code:`python/run_salt.py` and set
    :caption: Resources
 
    citations
-
-Support
--------
-
-For scientific or implementation questions, contact Cody A. Carr at
-:code:`codycarr24@gmail.com`. Bug reports should include the platform,
-compiler and dependency versions, a minimal parameter dictionary, and the
-expected and actual behavior.
