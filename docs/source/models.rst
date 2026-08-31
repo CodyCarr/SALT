@@ -31,12 +31,10 @@ Outflows and inflows
 --------------------
 
 SALT can model either material accelerating away from the central source or
-material falling inward toward it. Select the expanding-flow calculation with
-:code:`model_type="outflow"` and the contracting-flow calculation with
-:code:`model_type="inflow"`. The two implementations use the same biconical
-geometry and density field but adopt different radial velocity fields. Inflow
-speeds are supplied to the Python interface as positive magnitudes; the C
-dispatcher applies the inward radial direction internally.
+material falling inward toward it. The two implementations use the same
+biconical geometry and density field but adopt different radial velocity
+fields. Inflow speeds are supplied to the Python interface as positive
+magnitudes; the C dispatcher applies the inward radial direction internally.
 
 Radial structure
 ----------------
@@ -126,9 +124,6 @@ may also force a switch to the Sobolev approximation at the outflow speed
 specified by :code:`SW`. See :doc:`numerical` for details of this hybrid
 Sobolev/Voigt switch.
 
-Geometry in the predicted spectra
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 .. figure:: _static/images/geometry_profiles.png
    :width: 100%
    :align: center
@@ -144,13 +139,23 @@ Inflow
 ^^^^^^
 
 Use :code:`model_type="inflow"` for the contracting-flow model described by
-Carr & Scarlata (2022). Inflow speeds are supplied as positive magnitudes; the
-C dispatcher applies the internal sign convention.
+Carr & Scarlata (2022). This model strictly uses the Sobolev approximation. It
+does not accept :code:`v_b`, :code:`Sobolev`, :code:`SW`, or
+:code:`profile_method`, and it does not implement transition blending. It
+supports dust, finite apertures, source occultation, and resonant or
+fluorescent emission. Future work to add turbulent and thermal line broadening
+to the inflowing model is being considered, but a timeline has not been set.
 
-The current inflow model uses the Sobolev approximation. It does not accept
-:code:`v_b`, :code:`Sobolev`, :code:`SW`, or :code:`profile_method`, and it
-does not implement transition blending. It supports dust, finite apertures,
-source occultation, and resonant or fluorescent emission.
+.. figure:: _static/images/inflow_profile.png
+   :width: 80%
+   :align: center
+   :alt: Example Fe II inflow line profile calculated with SALT
+
+   Example SALT inflow prediction for Fe II :math:`\lambda2343`, including
+   resonant emission and the Fe II* :math:`\lambda2365` and
+   :math:`\lambda2381` fluorescent channels. The solid blue line marks the
+   resonant transition, and the dashed blue lines mark the fluorescent
+   transitions.
 
 Profile components
 ------------------
