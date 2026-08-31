@@ -146,16 +146,16 @@ supports dust, finite apertures, source occultation, and resonant or
 fluorescent emission. Future work to add turbulent and thermal line broadening
 to the inflowing model is being considered, but a timeline has not been set.
 
-.. figure:: _static/images/inflow_profile.png
-   :width: 80%
+.. figure:: _static/images/inflow_profiles_carr_scarlata_2022.png
+   :width: 100%
    :align: center
-   :alt: Example Fe II inflow line profile calculated with SALT
+   :alt: Absorption, emission, and inverse P Cygni profiles for a spherical inflow
 
-   Example SALT inflow prediction for Fe II :math:`\lambda2343`, including
-   resonant emission and the Fe II* :math:`\lambda2365` and
-   :math:`\lambda2381` fluorescent channels. The solid blue line marks the
-   resonant transition, and the dashed blue lines mark the fluorescent
-   transitions.
+   From left to right, the absorption profile, emission profile, and inverse
+   P Cygni profile for a spherical inflow. The asymmetry in the emission
+   profile reflects source occultation: photons emitted behind the source are
+   blocked from the observer's field of view. The model parameters are listed
+   in the left panel. From Figure 4 of Carr & Scarlata (2022).
 
 Profile components
 ------------------
