@@ -112,7 +112,7 @@ models' shared layout and their model-specific fields.
 
 ## Parameter conventions
 
-All wavelengths are in Angstrom, velocities are in km s${}^{-1}$, and angles
+All wavelengths are in Angstrom, velocities are in km/s, and angles
 are in radians.
 
 ### Shared flow parameters
