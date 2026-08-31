@@ -79,10 +79,13 @@ For the inflow,
    \left(\frac{R_{\rm W}}{R_{\rm SF}}\right)_{\rm in} =
    \left(\frac{v_w}{v_0}-1\right)^{1/\gamma}.
 
-The optical-depth normalization :math:`\tau` sets the interaction strength of
-each transition after its oscillator strength and wavelength are included.
-The covering fraction :math:`f_c` scales the fraction of the idealized flow
-occupied by absorbing material, while :math:`k` controls dust attenuation.
+The normalized optical-depth parameter :math:`\tau` sets the interaction
+strength of each transition after multiplication by its oscillator strength
+and wavelength. The covering fraction, or wind porosity, :math:`f_c` scales
+the fraction of the idealized flow occupied by absorbing material. It is not
+the traditional line-of-sight covering fraction, which depends on both
+:math:`f_c` and the geometry of the flow. The parameter :math:`k` controls
+dust attenuation.
 
 Line formation
 --------------
@@ -97,40 +100,45 @@ aperture when :code:`APERTURE=True`. The user parameter :code:`v_ap`
 represents the velocity at the projected radius of the aperture,
 :math:`R_{\rm AP}`.
 
-In a Sobolev calculation, a photon interacts with a geometrically thin surface
-of constant projected velocity, :math:`\Omega_x`. Thermal and microturbulent
-motions give that resonance a finite spatial width. The turbulent-outflow
-model therefore integrates the optical depth along the photon path through
-the wind rather than evaluating it only at the Sobolev surface.
+Model implementations
+---------------------
 
-.. figure:: _static/images/absorption_region.png
-   :width: 100%
-   :align: center
-   :alt: Thin Sobolev surface and broadened turbulent resonance region
-
-   Under the Sobolev approximation, absorption occurs at the thin black
-   surface. Thermal and turbulent motions broaden this into a volume. Red and
-   blue regions show gas whose projected velocities lie redward and blueward
-   of the nominal Sobolev resonance. From Carr et al. (2026).
-
-Choosing the implementation
----------------------------
-
-The :code:`model_type` argument is required. This prevents an inflow parameter
-set from being silently evaluated with the outflow equations, or vice versa.
+The geometry, density field, and line-formation framework described above can
+be evaluated using either the outflow or inflow implementation. The required
+:code:`model_type` argument selects the appropriate calculation and prevents
+an inflow parameter set from being evaluated inadvertently with the outflow
+equations, or vice versa.
 
 Turbulent outflow
 ^^^^^^^^^^^^^^^^^
 
 Use :code:`model_type="outflow"` for an expanding spherical or biconical
-flow. This model supports a Doppler parameter :math:`v_b`, Voigt absorption,
-resonant and fluorescent emission, dust, finite apertures, occultation, and
-attenuation or re-emission by neighboring transitions.
+flow. Only the outflow implementation accounts for thermal and turbulent
+motions in the wind, which are described by the Doppler parameter
+:math:`v_b`. This model supports Voigt absorption, resonant and fluorescent
+emission, dust, finite apertures, occultation, and attenuation or re-emission
+by neighboring transitions.
 
-The outflow model can use either the libcerf Faddeeva function
-(:code:`profile_method="wofz"`) or the COLT continued-fraction approximation
-(:code:`profile_method="colt"`). See :doc:`numerical` for the hybrid
+To compute the optical depth, the outflow model can use either the libcerf
+Faddeeva function (:code:`profile_method="wofz"`) or a faster method based on
+a continued-fraction approximation (:code:`profile_method="colt"`). The user
+may also force a switch to the Sobolev approximation at the outflow speed
+specified by :code:`SW`. See :doc:`numerical` for details of this hybrid
 Sobolev/Voigt switch.
+
+Geometry in the predicted spectra
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. figure:: _static/images/geometry_profiles.png
+   :width: 100%
+   :align: center
+   :alt: SALT and RASCAS line profiles for four outflow geometries
+
+   Si II :math:`\lambda\lambda1190,1193` profiles for a sphere and three
+   bicone orientations. Black curves show turbulent SALT, red curves show
+   RASCAS, and light-blue curves show the original Sobolev SALT model. This
+   comparison illustrates how :math:`\alpha` and :math:`\psi` change both
+   absorption and re-emission. From Carr et al. (2026).
 
 Inflow
 ^^^^^^
@@ -147,27 +155,15 @@ source occultation, and resonant or fluorescent emission.
 Profile components
 ------------------
 
-The :code:`profile_type` argument accepts:
+The outflow can return a pure absorption profile, a pure emission profile, or
+both. The inflow interface accepts the same profile-component choices. The
+:code:`profile_type` argument accepts:
 
 * :code:`"absorption"` for continuum absorption only;
 * :code:`"emission"` for scattered emission only; or
 * :code:`"pcygni"` for the combined profile.
 
 A complete definition of every input is given in :doc:`parameters`.
-
-Geometry in the predicted spectra
----------------------------------
-
-.. figure:: _static/images/geometry_profiles.png
-   :width: 100%
-   :align: center
-   :alt: SALT and RASCAS line profiles for four outflow geometries
-
-   Si II :math:`\lambda\lambda1190,1193` profiles for a sphere and three
-   bicone orientations. Black curves show turbulent SALT, red curves show
-   RASCAS, and light-blue curves show the original Sobolev SALT model. This
-   comparison illustrates how :math:`\alpha` and :math:`\psi` change both
-   absorption and re-emission. From Carr et al. (2026).
 
 Scope
 -----
