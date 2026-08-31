@@ -1,10 +1,15 @@
-C SALT
-======
+SALT
+====
 
-C SALT is a C implementation of the Semi-Analytical Line Transfer framework
+SALT is a C implementation of the Semi-Analytical Line Transfer framework
 for continuum absorption and resonant or fluorescent re-emission by spherical
 and biconical galactic flows. It provides separate turbulent-outflow and
 inflow models through one Python interface.
+
+.. image:: _static/images/logo.png
+   :width: 100%
+   :alt: Semi-Analytical Line Transfer model applied to a galactic outflow
+   :align: center
 
 The outflow implementation includes thermal and microturbulent broadening,
 dust, finite apertures, occultation, and attenuation by overlapping
