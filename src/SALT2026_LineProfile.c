@@ -421,8 +421,13 @@ static void absorption_run_final_flux(
         #pragma omp parallel for schedule(static)
         #endif
         for (int i = 0; i < nV; i++) {
-            double f = flux_out[i] + flux_out[i] * Iroll[i];
-            if (f < floorv) f = floorv;
+            const double input_flux = flux_out[i];
+            double f = input_flux + input_flux * Iroll[i];
+            /* ``floorv`` is a fractional residual continuum.  Scale it by
+               the incoming background so an ISM-depressed continuum is
+               never raised by an absorption-only transfer. */
+            const double floor_flux = input_flux * floorv;
+            if (f < floor_flux) f = floor_flux;
             flux_out[i] = f;
         }
     }
@@ -502,8 +507,12 @@ static void absorption_run_areas(
         #pragma omp parallel for schedule(static)
         #endif
         for (int i = 0; i < nV; i++) {
-            double f = flux[i] + flux[i] * Iroll[i];
-            if (f < floorv) f = floorv;
+            const double input_flux = flux[i];
+            double f = input_flux + input_flux * Iroll[i];
+            /* Keep the absorbed-energy calculation on the same fractional
+               continuum scale as the final absorption calculation. */
+            const double floor_flux = input_flux * floorv;
+            if (f < floor_flux) f = floor_flux;
             flux[i] = f;
         }
 
