@@ -8,8 +8,8 @@
  * continuum removed in successive radial shells, distributes that luminosity
  * among resonant/fluorescent channels, and optionally convolves the emitted
  * spectrum with the one-dimensional Maxwellian velocity distribution.  The
- * physical model is described by Carr et al. (2023, ApJ, 952, 88) and the
- * thermal/microturbulent extension documented with this release.
+ * physical model is described by Carr et al. (2023, ApJ, 952, 88) and Carr
+ * et al. (2026, arXiv:2608.30312) for thermal and microturbulent broadening.
  */
 
 #include <math.h>

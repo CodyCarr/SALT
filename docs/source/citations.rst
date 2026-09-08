@@ -14,8 +14,10 @@ When using the turbulent outflow model, cite:
   `doi:10.3847/1538-4357/acd331
   <https://doi.org/10.3847/1538-4357/acd331>`_.
 * Carr et al. (2026), *Testing SALT Approximations with Numerical Radiative
-  Transfer Code. II. Thermal and Microturbulent Line Broadening*, manuscript
-  associated with this software release.
+  Transfer Code. II. Thermal and Microturbulent Line Broadening*,
+  `arXiv:2608.30312 <https://arxiv.org/abs/2608.30312>`_,
+  `doi:10.48550/arXiv.2608.30312
+  <https://doi.org/10.48550/arXiv.2608.30312>`_.
 
 Physical foundation
 -------------------

@@ -17,9 +17,9 @@ The public C entry points are `Line_Profile` (outflow) and
 
 This implementation is based on:
 
-- Carr et al., *Testing SALT Approximations with Numerical Radiative Transfer
-  Code. II. Thermal and Microturbulent Line Broadening* (manuscript associated
-  with this release).
+- Carr et al. (2026), *Testing SALT Approximations with Numerical Radiative
+  Transfer Code. II. Thermal and Microturbulent Line Broadening*,
+  [arXiv:2608.30312](https://arxiv.org/abs/2608.30312).
 - Carr et al. (2023), *Testing SALT Approximations with Numerical Radiation
   Transfer Code. I. Validity and Applicability*, ApJ, 952, 88,
   <https://doi.org/10.3847/1538-4357/acd331>. These papers describe the physical
@@ -260,20 +260,26 @@ Please cite the model papers when using this code:
   doi     = {10.3847/1538-4357/acd331}
 }
 
-@unpublished{Carr2026,
-  author = {Carr, Cody A. and Cen, Renyue and Michel-Dansac, Leo and
-            Scarlata, Claudia and Henry, Alaina},
-  title  = {Testing SALT Approximations with Numerical Radiative Transfer
-            Code. II. Thermal and Microturbulent Line Broadening},
-  year   = {2026},
-  note   = {Manuscript associated with this software release}
+@ARTICLE{2026arXiv260830312C,
+       author = {{Carr}, Cody and {Cen}, Renyue and {Michel-Dansac}, Leo and {Scarlata}, Claudia and {Henry}, Alaina},
+        title = {Testing SALT Approximations with Numerical Radiative Transfer Code. II. Thermal and Microturbulent Line Broadening},
+      journal = {arXiv e-prints},
+     keywords = {Astrophysics of Galaxies},
+         year = 2026,
+        month = aug,
+          eid = {arXiv:2608.30312},
+        pages = {arXiv:2608.30312},
+          doi = {10.48550/arXiv.2608.30312},
+archivePrefix = {arXiv},
+       eprint = {2608.30312},
+ primaryClass = {astro-ph.GA},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2026arXiv260830312C},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 ```
 
 When using the inflow model, cite Carr & Scarlata (2022). When using the
-turbulent outflow model, cite Carr et al. (2023) and the associated thermal and
-microturbulent broadening paper. Replace the final entry with its journal
-citation after publication.
+turbulent outflow model, cite Carr et al. (2023) and Carr et al. (2026).
 
 ## Tested configuration
 
