@@ -73,7 +73,7 @@ blending_parameters = {
 # }
 
 
-observing_parameters = {"APERTURE": True, "v_ap": 500.0, "v_obs": v_obs}
+observing_parameters = {"APERTURE": True, "v_ap": 500.0}
 miscellaneous_parameters = {
     "OCCULTATION": False,
     "lam_ref": lam_ref,

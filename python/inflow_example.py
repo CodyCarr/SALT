@@ -47,7 +47,7 @@ emission_parameters = {
     "line_num": [3],
 }
 
-observing_parameters = {"APERTURE": True, "v_ap": 400.0, "v_obs": v_obs}
+observing_parameters = {"APERTURE": True, "v_ap": 400.0}
 miscellaneous_parameters = {"OCCULTATION": True, "lam_ref": lam_ref}
 
 profile_parameters = {

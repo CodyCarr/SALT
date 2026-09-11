@@ -19,7 +19,9 @@ Arguments
 ---------
 
 ``v_obs``
-   Strictly increasing observed-velocity grid in km/s.
+   Strictly increasing observed-velocity grid in km/s. Supply this only as
+   an argument to :code:`salt()` for both outflow and inflow models; do not
+   include it in :code:`observing_parameters`.
 
 ``lam_ref``
    Positive reference wavelength in Angstrom defining zero observed velocity.

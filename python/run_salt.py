@@ -384,14 +384,6 @@ def _salt_inflow(v_obs, lam_ref, background, flow_parameters, profile_parameters
     aperture = int(bool(observing.get("APERTURE", True)))
     occultation = int(bool(misc.get("OCCULTATION", True)))
 
-    if "v_obs" in observing:
-        observing_v_obs = _arr(observing["v_obs"])
-        if observing_v_obs.shape != v_obs.shape or not np.array_equal(
-            observing_v_obs, v_obs
-        ):
-            raise ValueError(
-                "observing_parameters['v_obs'] must match the v_obs argument"
-            )
     if "lam_ref" in misc and float(misc["lam_ref"]) != float(lam_ref):
         raise ValueError(
             "miscellaneous_parameters['lam_ref'] must match the lam_ref argument"
@@ -438,6 +430,7 @@ def salt(
 
     ``model_type`` is required and must be ``"outflow"`` or ``"inflow"``.
     Wavelengths are in Angstrom, velocities in km/s, and angles in radians.
+    Supply the velocity grid only through v_obs, not observing_parameters.
     """
     if model_type not in {"outflow", "inflow"}:
         raise ValueError("model_type must be 'outflow' or 'inflow'")

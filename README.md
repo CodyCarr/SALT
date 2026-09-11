@@ -142,7 +142,7 @@ column gives their position in the Python interface.
 
 | Key | Location | Meaning |
 | --- | --- | --- |
-| `v_obs` | Argument to `salt()` | Observed-velocity sampling grid |
+| `v_obs` | Argument to `salt()` only | Observed-velocity sampling grid; omit from `observing_parameters` for both models |
 | `lam_ref` | Argument to `salt()` | Reference wavelength defining zero observed velocity |
 | `background` | Argument to `salt()` | Incident continuum sampled on `v_obs` |
 | `v_ap` | `observing_parameters` | Aperture velocity corresponding to the projected aperture radius |
